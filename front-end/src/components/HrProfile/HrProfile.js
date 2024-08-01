@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './HrProfile.css';
-import HrNavbar from './HrNavbar/HrNavbar';
+import HrNavbar from '../HrNavbar/HrNavbar';
 
 const ProfilePage = () => {
   const [showModal, setShowModal] = useState(false);

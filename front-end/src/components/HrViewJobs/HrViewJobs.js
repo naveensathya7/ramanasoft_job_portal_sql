@@ -6,7 +6,7 @@ import axios from 'axios';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import { MdEdit, MdDelete } from 'react-icons/md';
 import HrNavbar from '../HrNavbar/HrNavbar';
-import EditJobModal from '../EditJobModal';
+import EditJobModal from '../EditJobModal/EditJobModal';
 import './HrViewJobs.css';
 
 const HrViewJobs = () => {

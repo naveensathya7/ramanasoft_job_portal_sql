@@ -1,0 +1,672 @@
+
+body{
+    background-color:white;
+  }
+  
+  .cardone {
+      background-color: #f2f6fc;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .container-h5 {
+      text-align: center;
+    }
+    
+    .container-h5 h5 {
+      font-size: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      display: inline-block;
+      padding: 0 20px;
+    }
+    
+    .container-h5 h5::before,
+    .container-h5 h5::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 60px;
+      height: 2px;
+      background-color: #3498db;
+    }
+    
+    .container-h5 h5::before {
+      left: 100%;
+    }
+    
+    .container-h5 h5::after {
+      right: 100%;
+    }
+    .content-container {
+      max-width: 1000px;
+      margin-left: 270px;
+      display: flex;
+      flex-direction: column;
+    }
+  
+    .welcome-section {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 30px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+     
+  
+    .section-header h3 {
+      color: #2c3e50;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      
+    }
+  
+    .our-clinic {
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+    
+    }
+  
+    .welcome-left {
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+  
+    .other-services-block {
+      background-color: #fff;
+      cursor: pointer;
+      border-radius: 8px;
+      height: 250px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      padding: 20px 15px;
+      text-align: center;
+      margin-bottom: 10px;
+      border: rgba(0, 0, 0, 0.39) 1px solid;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+  
+    .other-services-block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  
+    .services-block-icon {
+      font-size: 36px;
+      color: #3498db;
+      margin-bottom: 15px;
+    }
+  
+    .other-services-content h5 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  
+    .other-services-content p {
+      color: #7f8c8d;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  
+    .clinic-form {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      height: 640px;
+      flex: 1;
+    }
+  
+    .appoinment-form {
+      background-color: #c6d9f5;
+      border-radius: 8px;
+      border: rgba(0, 0, 0, 0.39) 1px solid;;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      height: 103%;
+      display: flex;
+      flex-direction: column;
+    }
+    .appoinment-form:hover {
+      transform: translateY(3px);
+    }
+  
+    .appoinment-form h5 {
+      color: #2c3e50;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+  
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  
+    .form-group {
+      margin-bottom: 15px;
+    }
+  
+    .form-control {
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s;
+    }
+  
+    .form-control:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+    }
+  
+    .bootstrap-select .btn-default {
+      background-color: #fff;
+      border-color: #ccc;
+      color: #2c3e50;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+  
+    .bootstrap-select .btn-default:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+    }
+  
+    .btn-submit {
+      background-color: #3498db;
+      color: #fff;
+      border-radius: 20px;
+      padding: 10px 25px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+      display: block;
+      margin: 15px auto 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  
+    .btn-submit:hover {
+      background-color: #2c3e50;
+    }
+  
+  .cardtwo {
+    display: flex;
+    width: 1241px;
+    height: 616px;
+    margin-right: 25px;
+    margin-left: 150px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    color: white;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  .card1{
+    color: white;
+    background-color: rgba(199, 190, 190, 0.433);
+    border-radius: 10px;
+    padding: 20px;
+    font-size: larger;
+    font-weight: bold;
+    max-width: 300px;
+    margin-top: 150px;
+    margin-left: 200px;
+    
+  }
+   .card2 {
+    color: black;
+    background-color: rgba(199, 190, 190, 0.433); /* Semi-transparent white background */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Padding for spacing within the card */
+    max-width: 600px;
+    margin-top: 470px;
+    margin-left: 260px;
+      font-size: larger;
+    font-weight: bold;
+    }
+  
+    .card3 {
+      color: black;
+      background-color: rgba(199, 190, 190, 0.433);
+      border-radius: 10px;
+      padding: 20px; /* Padding for spacing within the card */
+      max-width: 600px;
+       /* Adjust the maximum width as needed */
+      margin-top: 470px;
+      margin-left: 260px;
+        font-size: larger;
+      font-weight: bold;
+      }
+  
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-button {
+    padding: 6px 24px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    color: #000;
+    background-color: #00bbff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0);
+    transition: background-color 1s ease, transform 1s ease;
+    cursor: pointer;
+  }
+  
+  .dropdown-content {
+    position: absolute;
+    right: 0;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    background-color: #ffffff;
+    min-width: 100px;
+    border-radius: 8px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+  
+  .dropdown-link {
+    color: black;
+    padding: 12px 14px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  
+  .dropdown-link:hover {
+    background-color: #000000;
+    color: rgb(255, 255, 255);
+    border-radius: 8px;
+  }
+  
+  /* Header Styles */
+  .header {
+    background-color: #1090adfa;
+    color: #fff;
+    padding: 9px;
+    font-family: 'Arial', sans-serif;
+    text-align: right;
+  }
+  
+  .nav-links ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .nav-links ul li {
+    display: inline;
+    margin-right: 20px;
+  }
+  
+  .nav-links ul li a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-links ul li a:hover {
+    color: #eab84d; /* Change color on hover */
+  }
+  
+  .dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-button {
+    background-color: #55555500;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px ;
+    border:none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdown-button:hover {
+    background-color: #ffffff;
+    color: #000;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #0084ff;
+    min-width: 120px;
+    z-index: 1;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Add box shadow */
+  }
+  
+  .dropdown-content a {
+    color: #fff;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #ffffff; 
+    color: #000;
+  }
+  
+  .dropdown-container:hover .dropdown-content {
+    display: block;
+  }
+  
+  /* Slider Styles */
+  .slider {
+    width: 80%;
+    margin: 20px auto;
+    overflow: hidden;
+  }
+  
+  .slide-container {
+    width: 100%;
+    display: flex;
+  }
+  
+  .slide {
+    width: 100%;
+    transition: transform 0.5s ease;
+  }
+  
+  .slide img {
+    width: 100%;
+  }
+  
+  .logo1{
+    cursor: pointer;
+      max-height: 25px;
+      max-width: 100px;
+    margin-top: 9px;
+    margin-left: 10px;
+      width:500px;
+      height:1500px;
+      background-size: cover;
+      float: left;
+  }
+  
+  /* Gallery Section */
+  .gallery-section {
+    padding: 40px 0;
+    max-width: fit-content;
+    max-height: fit-content;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+  }
+  
+  .section-header {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+  }
+  
+  .section-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #333;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 10px;
+  }
+  
+  .section-header h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 650px;
+    height: 3px;
+    background-color: #ff6600;
+  }
+  
+  .portfolio-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .portfolio-list li {
+    padding: 15px;
+  }
+  
+  .content-image-block {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .content-image-block img {
+    width: 100%;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  .content-block-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    transform: translateY(20px);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+  
+  .content-image-block:hover img {
+    transform: scale(1.1);
+    filter: brightness(0.8);
+  }
+  
+  .content-image-block:hover .content-block-hover {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .content-block-hover span {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease 0.1s;
+    opacity: 0;
+  }
+  
+  .content-block-hover h5 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease 0.2s;
+    opacity: 0;
+  }
+  
+  .content-block-hover a {
+    color: #fff;
+    font-size: 20px;
+    margin: 0 10px;
+    transition: color 0.3s ease, transform 0.3s ease 0.3s;
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  
+  .content-block-hover a:hover {
+    color: #ff6600;
+  }
+  
+  .content-image-block:hover .content-block-hover span,
+  .content-image-block:hover .content-block-hover h5,
+  .content-image-block:hover .content-block-hover a {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@600&display=swap');
+  
+  /* contact section */
+  /* Contact Card */
+  .contactcard {
+    background-color: #f8f8f8;
+    min-width: 1000px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    position: relative;
+    max-width: 500px; /* Added max-width */
+    margin: 10px auto; /* Center the contact card */
+  }
+  
+  .contactcard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background-color: #ff6600;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  
+  .footer-main {
+    background-color: #333;
+    color: #fff;
+    padding: 60px 0;
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .footer-main .widget-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    position: relative;
+    padding-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .footer-main .widget-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 250px;
+    height: 3px;
+    background-color: #ff6600;
+  }
+  
+  .footer-main .contact-info p {
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-family: 'Open Sans', sans-serif;
+    transition: transform 0.3s ease;
+  }
+  
+  .footer-main .contact-info p:hover {
+    transform: translateX(10px);
+  }
+  
+  .footer-main .contact-info p i {
+    margin-right: 10px;
+    color: #ff6600;
+    font-size: 22px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  .footer-main .widget-title,
+  .footer-main .contact-info p,
+  .footer-social ul li {
+    animation: fadeIn 1s ease-in-out;
+  }
+  
+  
+  .carousel {
+    min-width: 1300px;
+  }
+  .carousel-item {
+    height: 713px;
+  }
+  
+  .carousel-item img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 40px; /* Adjust the width of the controls */
+    border-radius: 15px; /* Make the controls circular */
+    opacity: 0.5; /* Set the initial opacity of the controls */
+    transition: o.3 step-start; /* Add a transition effect for the opacity */
+  }
+  
+  .carousel-control-prev:hover,
+  .carousel-control-next:hover {
+    opacity: 1; /* Change the opacity of the controls on hover */
+  }
+  
+  /* Carousel control icons */
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    filter: invert(1); /* Invert the color of the icons */
+  }
+  
+  
+  

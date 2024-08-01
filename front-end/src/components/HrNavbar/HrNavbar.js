@@ -2,6 +2,7 @@
 import { Navbar, Nav, Container,Dropdown } from 'react-bootstrap';
 import {Link,useNavigate,} from 'react-router-dom';
 import Cookies from 'js-cookie';
+import QuizDash from '../Quiz/Admin/quiz/quizdash';
 import ramana from '../../images/p3.jpeg';
 //import './HrNavbar.css'
 
@@ -53,6 +54,9 @@ const HrNavbar=()=>{
   </Nav.Item >
   <Nav.Item style={{width:'100px',textDecoration:'none',textAlign:'center'}} className="nav-link fw-bold me-4 ">
     <Link to="/hr-dashboard/profile"  style={{textDecoration:'none',color:'white'}} >Profile</Link>
+  </Nav.Item >
+  <Nav.Item style={{width:'100px',textDecoration:'none',textAlign:'center'}} className="nav-link fw-bold me-4 ">
+    <Link to="/hr-dashboard/quiz"  style={{textDecoration:'none',color:'white'}} >Quiz</Link>
   </Nav.Item >
   <Nav.Item  style={{width:'100px',textDecoration:'none',color:'white',marginLeft:0,textAlign:'center'}} className="nav-link fw-bold me-4 pt-1 ml-0 d-flex justify-content-center">
    <button onClick={logout} className='btn bg-transparent logout-btn fw-bold ml-5 w-100 pt-0' style={{color:'white',alignSelf:'center',width:'100%'}}> Logout</button> 

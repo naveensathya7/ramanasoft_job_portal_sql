@@ -1,0 +1,139 @@
+.Navbody {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.top-panel {
+    background-color: #3c73c5;
+    padding: 10px 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.menu2 {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.menu2 li {
+    cursor: pointer;
+    padding: 10px 20px;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu2 li.active {
+    background-color: #fff;
+    color: #3c73c5;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.menu2 li:hover {
+    background-color: #2b58a1;
+}
+
+.content {
+    flex: 1;
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 20px;
+    width: 1400px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.quiz-container {
+    display: flex;
+    height: 100%;
+}
+
+.left-panel {
+    width: 18%;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.right-panel {
+    width: 70%;
+    padding: 20px;
+    background-color: #fff;
+    overflow-y: auto;
+}
+
+.folder-list, .content-display {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.folder-item, .subfolder-item, .quiz-item {
+    margin: 10px -20px;
+}
+
+.folder-header, .subfolder-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.folder-header:hover, .subfolder-header:hover {
+    background-color: #dee2e6;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+input {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: calc(100% - 100px);
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-folder-icon, .add-subfolder-icon, .toggle-icon {
+    cursor: pointer;
+}
+
+.add-folder-button, .add-subfolder-button, .add-quiz-button {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.cancel-button {
+    background-color: #dc3545;
+    color: #fff;
+    margin-left: 10px;
+}
+
+.add-folder-icon, .add-subfolder-icon, .toggle-icon {
+    color: #007bff;
+}
+
+.error {
+    color: red;
+    margin-top: 10px;
+}

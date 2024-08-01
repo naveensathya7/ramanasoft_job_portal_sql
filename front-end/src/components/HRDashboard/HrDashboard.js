@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, Button, Container, Row, Col } from 'react-bootstrap';
 import { IoPersonAddSharp } from "react-icons/io5";
 import { FaChevronCircleRight, FaCheck, FaTimes, FaUserTie } from "react-icons/fa";
-import HrNavbar from './HrNavbar/HrNavbar';
+import HrNavbar from '../HrNavbar/HrNavbar';
 import axios from 'axios';
 import './HrDashboard.css';
 

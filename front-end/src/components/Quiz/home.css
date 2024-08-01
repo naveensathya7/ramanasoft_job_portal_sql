@@ -1,0 +1,43 @@
+.create-dash {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.top-panel {
+    background-color: #3c73c5;
+    padding-top: 10px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
+    cursor: pointer;
+    padding: 10px 20px;
+    color: #fff;
+    font-weight: bold;
+}
+
+.menu li.active {
+    background-color: #fff;
+    color: #3c73c5;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.content {
+    background-color: #f0f0f0;
+    flex: 1;
+    padding: 20px;
+    margin-left: 200px;
+    margin-right: 200px;
+    height: 700px;
+}
