@@ -26,6 +26,15 @@ var io = require('socket.io')(server, { cors: { origin: '*' } });
 const ZEPTOMAIL_API_URL = 'https://api.zeptomail.in/v1.1/email';
 const ZEPTOMAIL_API_KEY = 'Zoho-enczapikey PHtE6r0EFLjr3jMsp0QAt/+wE8TyN40tr+hmKFMVsIgUXqMFTk0Bqdl6wDPiqU8jXPJHR/ObzN5ttLOe5+ONdGrtZG1NXmqyqK3sx/VYSPOZsbq6x00etFUdcE3aUIbvetFq0ifQvpoolcNA==';
 
+const query = (sql, values) => {
+  return new Promise((resolve, reject) => {
+    //console.log("In pool",sql,values)
+    pool.query(sql, values, (error, results) => {
+      if (error) return reject(error);
+      resolve(results);
+    });
+  });
+};
 
 // Store the last check timestamp
 let lastCheckTime = new Date();
@@ -34,12 +43,12 @@ const checkInternRequests = async () => {
   try {
     //console.log(`Checked at ${Date()}`)
     // Fetch all rows from intern_requests table that have changed since lastCheckTime
-    const [internRequests] = pool.query('SELECT * FROM intern_requests;');
+    const [internRequests] = query('SELECT * FROM intern_requests;');
     if (internRequests.length > 0) {
       lastCheckTime = new Date(); // Update the last check time
 
       // Fetch all intern data
-      const [allInterns] = await pool.query('SELECT * FROM intern_requests');
+      const [allInterns] = await query('SELECT * FROM intern_requests');
       //console.log(allInterns)
       io.emit('internRequestsUpdate', allInterns);
     }
@@ -49,11 +58,11 @@ const checkInternRequests = async () => {
 };
 
 // Polling every 10 seconds for changes
-setInterval(checkInternRequests, 10000);
+//setInterval(checkInternRequests, 10000);
 
 
 const createJob = async(jobDetails) => {
-  const jobId = await pool.query('SELECT MAX(jobId) AS id FROM jobs;') 
+  const jobId = await query('SELECT MAX(jobId) AS id FROM jobs;') 
   console.log(jobId[0][0].id)
   let createdId=0
   if(jobId[0][0].id===null){
@@ -70,7 +79,7 @@ const createJob = async(jobDetails) => {
   };
 };
 const createRequestId = async(jobDetails) => {
-  const jobId = await pool.query('SELECT MAX(requestID) AS id FROM hr_requests;') 
+  const jobId = await query('SELECT MAX(requestID) AS id FROM hr_requests;') 
   console.log(jobId[0][0].id)
   let createdId=0
   if(jobId[0][0].id===null){
@@ -88,7 +97,7 @@ const createRequestId = async(jobDetails) => {
 };
 
 const generateStudentId = async () => {
-        const jobId = await pool.query('SELECT MAX(candidateID) AS id FROM interns;')
+        const jobId = await query('SELECT MAX(candidateID) AS id FROM interns;')
         console.log(jobId)
         let createdId=0
         if(jobId[0][0].id===null){
@@ -132,10 +141,10 @@ const moveExpiredJobs = async () => {
   try {
     const today = new Date();
     console.log("Cron runned");
-    const [expiredJobs] = await pool.query('SELECT * FROM jobs WHERE lastDate < ?', [today]);
+    const [expiredJobs] = await query('SELECT * FROM jobs WHERE lastDate < ?', [today]);
     for (const job of expiredJobs) {
-      await pool.query('INSERT INTO past_jobs SET ?', { ...job, movedOn: today });
-      await pool.query('DELETE FROM jobs WHERE jobId = ?', [job.jobId]);
+      await query('INSERT INTO past_jobs SET ?', { ...job, movedOn: today });
+      await query('DELETE FROM jobs WHERE jobId = ?', [job.jobId]);
     }
     console.log(`${expiredJobs.length} jobs moved to PastJobs collection.`);
   } catch (error) {
@@ -149,7 +158,7 @@ app.put("/applications/:id/status",async(req,res)=>{
   const{id}=req.params
   console.log(status,id)
   try{
-    const [result]=await pool.query('UPDATE applied_Students SET status=? WHERE applicationID=?',[status,id])
+    const [result]=await query('UPDATE applied_Students SET status=? WHERE applicationID=?',[status,id])
     console.log(result)
     res.status(200).json({message:"Status Changed Successfully"})
   }catch(err){
@@ -165,7 +174,7 @@ app.post('/apply', upload.single('resume'), async (req, res) => {
   try {
     
     // Insert application into the database
-    await pool.query(
+    await query(
       'INSERT INTO applied_Students (fullName,jobRole, email,companyName, technology, mobileNo, gender, passedOut, experience, status, resume) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)',
       [fullName,jobRole, email,companyName, technology, mobileNo, gender, passedOut, experience, status, resume]
     );
@@ -182,7 +191,7 @@ app.get('/download-resume/:id', async (req, res) => {
   console.log(id)
   try {
     // Fetch the resume from the database
-    const [rows] = await pool.query('SELECT resume FROM applied_Students WHERE applicationID = ?', [id]);
+    const rows = await query('SELECT resume FROM applied_Students WHERE applicationID = ?', [id]);
     
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Resume not found' });
@@ -211,7 +220,7 @@ app.get('/applications', async (req, res) => {
   const sql = 'SELECT * FROM applied_Students';
 
   try {
-    const [rows] = await pool.execute(sql);
+    const rows = await query(sql);
 
     // Encode binary data to base64
     const response = rows.map(row => ({
@@ -231,15 +240,15 @@ app.get('/statistics/:status',async(req,res)=>{
   try{
     let  result;
     if(status==='applied'){
-      [result]=await pool.execute('SELECT COUNT(*) as count FROM applied_Students;')
+      [result]=await query('SELECT COUNT(*) as count FROM applied_Students;')
 
     }
     else{
-      [result]=await pool.execute(`SELECT COUNT(*) as count FROM applied_Students WHERE status='${status}'`)
+      [result]=await query(`SELECT COUNT(*) as count FROM applied_Students WHERE status='${status}'`)
     }
-    console.log(result)
+    console.log(result.count)
 
-    res.status(200).json(result[0]); // Send back the modified rows
+    res.status(200).json(result); // Send back the modified rows
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server Error' });
@@ -252,7 +261,7 @@ app.get('/applications/:status', async (req, res) => {
   const sql = `SELECT * FROM applied_Students WHERE status="${status}"`;
 
   try {
-    const [rows] = await pool.execute(sql);
+    const rows = await query(sql);
 
     // Encode binary data to base64
     const response = rows.map(row => ({
@@ -279,19 +288,19 @@ app.post("/signup-hr", async (req, res) => {
   }
 
   try {
-    const [hrRequestRows] = await pool.execute(
+    const [hrRequestRows] = await query(
       'SELECT * FROM hr_requests WHERE email = ? OR mobileNo = ?',
       [email, mobileNo]
     );
 
-    const [hrRows] = await pool.execute(
+    const [hrRows] = await query(
       'SELECT * FROM hrs WHERE email = ? OR mobileNo = ?',
       [email, mobileNo]
     );
 
     if (hrRequestRows.length === 0 && hrRows.length === 0) {
       const candId = await createRequestId(req.body);
-      const [result] = await pool.execute(
+      const [result] = await query(
         'INSERT INTO hr_requests (requestID,fullName, email, mobileNo) VALUES (?,?, ?, ?)',
         [candId.requestID,fullName, email, mobileNo]
       );
@@ -320,12 +329,14 @@ app.post("/login-hr", async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.execute(
+    const rows = await query(
       'SELECT * FROM hrs WHERE mobileNo = ?',
       [mobileNo]
     );
+    console.log(rows)
 
     if (rows.length > 0) {
+      console.log("Entered")
       res.status(200).json({ record: rows[0], message: 'Please Login' });
     } else {
       res.status(400).json({ error: 'HR not found, please register' });
@@ -338,33 +349,33 @@ app.post("/login-hr", async (req, res) => {
 
 app.post("/post-job", async (req, res) => {
   const {job} = req.body
-  console.log(req.body)
+  console.log(job)
   try {
      
     // Build the SELECT query to check for duplicates
-    const [rows] = await pool.query(`
+    const rows = await query(`
       SELECT * FROM jobs WHERE jobRole = ? AND companyName = ? AND Location = ? AND jobCategory = ? AND jobTags = ? 
       AND jobExperience = ? AND jobQualification = ? AND email = ? AND phone = ? AND postedOn = ? AND lastDate = ? 
       AND requirements = ? AND responsibilities = ? AND jobDescription = ? AND salary = ? AND applicationUrl = ? 
       AND requiredSkills = ? AND jobType = ? AND jobTitle = ?`, 
       [
-        job.jobRole, job.companyName, job.Location, job.jobCategory, job.jobTags,
+        job.jobRole, job.companyName, job.jobCity, job.jobCategory, job.jobTags,
         job.jobExperience, job.jobQualification, job.email, job.phone, job.postedOn, job.lastDate,
         job.requirements, job.responsibilities, job.jobDescription, job.salary, job.applicationUrl,
         job.requiredSkills, job.jobType, job.jobTitle
       ]);
-      console.log('INSERT INTO jobs (jobRole,companyName,Location,jobCategory,jobTags, jobExperience,jobQualification,email,phone,postedOn,lastDate, requirements,responsibilities,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
+      /*console.log('INSERT INTO jobs (jobRole,companyName,Location,jobCategory,jobTags, jobExperience,jobQualification,email,phone,postedOn,lastDate, requirements,responsibilities,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
       job.jobRole, job.companyName, job.jobCity, job.jobCategory, job.jobTags,
       job.jobExperience, job.jobQualification, job.email, job.phone, job.postedOn, job.lastDate,
       job.requirements, job.responsibilities, job.jobDescription, job.salary, job.applicationUrl,
       job.requiredSkills, job.jobType, job.jobTitle
-    ])
+    ])*/
     // Check if any record matches
     if (rows.length > 0) {
       return res.status(400).json({ message: 'Duplicate job entry detected, job not posted.' });
     }
-    await pool.query('INSERT INTO jobs (jobRole,companyName,Location,jobCategory,jobTags, jobExperience,jobQualification,email,phone,postedOn,lastDate, requirements,responsibilities,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
-      job.jobRole, job.companyName, job.Location, job.jobCategory, job.jobTags,
+    await query('INSERT INTO jobs (jobRole,companyName,Location,jobCategory,jobTags, jobExperience,jobQualification,email,phone,postedOn,lastDate, requirements,responsibilities,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
+      job.jobRole, job.companyName, job.jobCity, job.jobCategory, job.jobTags,
       job.jobExperience, job.jobQualification, job.email, job.phone, job.postedOn, job.lastDate,
       job.requirements, job.responsibilities, job.jobDescription, job.salary, job.applicationUrl,
       job.requiredSkills, job.jobType, job.jobTitle
@@ -389,7 +400,7 @@ app.post("/update-job", async (req, res) => {
 
     const values = [...Object.values(changedValues), jobId];
 
-    const [result] = await pool.query(
+    const result = await query(
       `UPDATE jobs SET ${setPart} WHERE jobId = ?`,
       values
     );
@@ -431,7 +442,7 @@ app.post('/send-email', async (req, res) => {
 app.get("/fullinfo",async(req,res)=>{
     try {
        // const username = 'naveenvanamoju';
-        const [user] = await pool.query('SELECT * FROM users ;');
+        const [user] = await query('SELECT * FROM users ;');
         res.json(user);
       } catch (err) {
         res.status(500).json({ message: 'Server error' });
@@ -440,7 +451,7 @@ app.get("/fullinfo",async(req,res)=>{
 app.get("/users", async (req, res) => {
   try {
     const username = 'naveenvanamoju';
-    const [user] = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+    const [user] = await query('SELECT * FROM users WHERE username = ?', [username]);
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -449,7 +460,7 @@ app.get("/users", async (req, res) => {
 
 app.get("/intern-requests", async (req, res) => {
   try {
-    const [intern] = await pool.query('SELECT * FROM intern_requests');
+    const intern = await query('SELECT * FROM intern_requests');
     io.emit('internRequestsUpdate', intern);
     res.status(200).json(intern);
   } catch (err) {
@@ -459,7 +470,7 @@ app.get("/intern-requests", async (req, res) => {
 
 app.get("/view-jobs", async (req, res) => {
   try {
-    const [jobs] = await pool.query('SELECT * FROM jobs');
+    const jobs = await query('SELECT * FROM jobs');
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -468,7 +479,7 @@ app.get("/view-jobs", async (req, res) => {
 
 app.get("/past-jobs", async (req, res) => {
   try {
-    const [jobs] = await pool.query('SELECT * FROM past_jobs');
+    const jobs = await query('SELECT * FROM past_jobs');
     res.status(200).json(jobs);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -477,7 +488,7 @@ app.get("/past-jobs", async (req, res) => {
 
 app.get("/hr-requests", async (req, res) => {
   try {
-    const [hr] = await pool.query('SELECT * FROM hr_requests');
+    const [hr] = await query('SELECT * FROM hr_requests');
     res.status(200).json(hr);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -492,7 +503,7 @@ app.post("/accept-interns", async (req, res) => {
 
   try {
     // Fetch existing interns' emails and mobile numbers
-    const [existingInterns] = await pool.query('SELECT email, mobileNo FROM interns WHERE email IN (?) OR mobileNo IN (?)', [
+    const [existingInterns] = await query('SELECT email, mobileNo FROM interns WHERE email IN (?) OR mobileNo IN (?)', [
       interns.map(intern => intern.email),
       interns.map(intern => intern.mobileNo)
     ]);
@@ -505,7 +516,7 @@ app.post("/accept-interns", async (req, res) => {
         rejectedInterns.push(intern);
         console.log("rejected:", rejectedInterns);
       } else {
-        await pool.query('INSERT INTO interns (fullName, email, mobileNo, altMobileNo, domain, belongedToVasaviFoundation, address, batchNo, modeOfInternship) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+        await query('INSERT INTO interns (fullName, email, mobileNo, altMobileNo, domain, belongedToVasaviFoundation, address, batchNo, modeOfInternship) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [
           intern.fullName,
           intern.email,
           intern.mobileNo,
@@ -524,7 +535,7 @@ app.post("/accept-interns", async (req, res) => {
     const processedInterns = [...acceptedInterns, ...rejectedInterns];
 
     if (processedInterns.length > 0) {
-      await pool.query('DELETE FROM intern_requests WHERE email IN (?) OR mobileNo IN (?)', [
+      await query('DELETE FROM intern_requests WHERE email IN (?) OR mobileNo IN (?)', [
         processedInterns.map(intern => intern.email),
         processedInterns.map(intern => intern.mobileNo)
       ]);
@@ -563,7 +574,7 @@ app.post("/reject-interns", async (req, res) => {
     console.log('SQL Query:', sql_q);
     console.log('Parameters:', requestIDs);
 
-    const [result] = await pool.execute(sql_q, requestIDs);
+    const [result] = await query(sql_q, requestIDs);
     console.log('Query result:', result);
 
     if (result.affectedRows === requestIDs.length) {
@@ -592,7 +603,7 @@ app.delete('/delete-job/:jobId', async (req, res) => {
   console.log(jobId)
   
   try {
-    const [result] = await pool.query(`DELETE FROM jobs WHERE jobId = ${jobId}`);
+    const [result] = await query(`DELETE FROM jobs WHERE jobId = ${jobId}`);
     console.log(result)
     if (result.affectedRows === 1) {
       res.status(201).json({ message: 'Job deleted successfully' });
@@ -609,7 +620,7 @@ app.post("/save-interns", async (req, res) => {
   const jobId = req.body.jobId;
   const job = req.body;
   try {
-    await pool.query('INSERT INTO intern_requests SET ?', job);
+    await query('INSERT INTO intern_requests SET ?', job);
     res.status(201).json({ message: 'Intern created successfully' });
   } catch (err) {
     console.error(err);
@@ -1400,4 +1411,3 @@ app.get('/submissions', (req, res) => {
       res.status(200).json(results);
   });
 });
-

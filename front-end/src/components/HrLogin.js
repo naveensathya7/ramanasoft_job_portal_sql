@@ -100,6 +100,7 @@ const HrLogin = () => {
         console.log("Sending OTP...");
         setOtpSent(true);
         setTimer(60);
+        console.log(generatedOtp)
         await OtpService.sendOtp(formData.mobileNo, generatedOtp);
         console.log("Hii")
       } catch (error) {

@@ -95,7 +95,7 @@ function App() {
           <Route path="quiz/:user_id/:token" element={<QuizAttempt />} />
           <Route path='preview/:token' element={<PreviewQuiz />} />
           <Route path='editor' element={<QuizCreationPage />} />
-          <Route path='/' element={<QuizDash />} />
+
           <Route path='login/*'>
             <Route path='admin' element={<AdminLogin />} />
             <Route path='intern-login' element={<InternLogin />} />

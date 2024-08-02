@@ -49,7 +49,7 @@ const UserQuizAnalysis = () => {
                 <p>Score: {score} ({grade})</p>
                 <p>Duration: {duration}s</p>
             </div>
-            <h3>Your Responses</h3>
+            {/* <h3>Your Responses</h3>
             {responses.length === 0 && <p>No responses found</p>}
             {responses.map((response, index) => (
                 <div key={index} className="question-container">
@@ -66,7 +66,7 @@ const UserQuizAnalysis = () => {
                         </div>
                     </div>
                 </div>
-            ))}
+            ))} */}
         </div>
     );
 };
