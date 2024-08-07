@@ -1,92 +1,91 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import HrNavbar from '../HrNavbar/HrNavbar';
-import axios from 'axios'
-import {toast} from 'react-toastify'
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const validationSchema = Yup.object().shape({
   jobTitle: Yup.string().required('Job Title is required'),
   companyName: Yup.string().required('Company Name is required'),
   jobType: Yup.string().required('Job Type is required'),
   jobCategory: Yup.string().required('Job Category is required'),
-  jobTags: Yup.string().required('Job Tags are required'),
   jobExperience: Yup.string().required('Job Experience is required'),
   jobQualification: Yup.string().required('Job Qualification is required'),
   requiredSkills: Yup.string().required('Required Skills are required'),
-  jobRole: Yup.string().required('Job Role is required'),
   jobCity: Yup.string().required('Job City is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   phone: Yup.string().required('Phone is required'),
-  postedOn: Yup.date().required('Posted On date is required'),
   lastDate: Yup.date().required('Last Date is required'),
-  responsibilities: Yup.string().required('Responsibilities are required'),
-  requirements: Yup.string().required('Requirements are required'),
   jobDescription: Yup.string().required('Job Description is required'),
   salary: Yup.string().required('Salary is required'),
   applicationUrl: Yup.string().url('Invalid URL').required('Application URL is required')
 });
 
 const HrPostJobs = () => {
-
-
-
+  const [companyNames, setCompanyNames] = useState([]);
+  const [companyDetails, setCompanyDetails] = useState({});
   
-  const handleSubmit = async(values, { setSubmitting, resetForm }) => {
-    // Perform API call or further actions here
-    console.log(values); // Replace with your API call
+  useEffect(() => {
+    fetchCompanyNames();
+  }, []);
 
-    // Example API call using fetch
-    await axios.post("http://localhost:5000/post-job",{job:values})
-      .then(response=>{
-        console.log("Registration request sent",response)
-        toast.success(`Job posted successfully`, {
-          autoClose: 5000
-        })
-        resetForm();
-        
-        
-      })
-      .catch(error=>{
-        console.error('There was an error registering!', error);
-                console.log(error)
-                toast.error(`${error.response.data.message}`, {
-                  autoClose: 5000
-                })
-                
-                
-      })
-    
-     
-      
+  const fetchCompanyNames = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/registered-companies');
+      setCompanyNames(response.data);
+      const details = response.data.reduce((acc, company) => {
+        acc[company.companyName] = { email: company.email, phone: company.mobileNo };
+        return acc;
+      }, {});
+      setCompanyDetails(details);
+    } catch (error) {
+      console.error('Error fetching company names', error);
+    }
   };
 
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    console.log(values);
+    try {
+      const response = await axios.post('http://localhost:5000/post-job', { job: values });
+      console.log('Registration request sent', response);
+      toast.success('Job posted successfully', {
+        autoClose: 5000
+      });
+      resetForm();
+    } catch (error) {
+      console.error('There was an error registering!', error);
+      toast.error(`${error.response?.data?.message || 'Error posting job'}`, {
+        autoClose: 5000
+      });
+    }
+  };
+  console.log(companyDetails)
   return (
     <>
       <HrNavbar />
       <div style={{ overflow: 'auto', backgroundColor: '#BED7DC' }}>
         <Container className='mt-3 mb-3 p-2 pl-5' style={{ width: '95%', height: '90%', backgroundColor: 'white', overflowY: 'auto', overflowX: 'hidden', boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)', borderRadius: '5px' }}>
-          <h1 className="my-4 fw-bold"  style={{color:'#6B92FA',fontStyle:'Roboto'}}>Post a New Job</h1>
+          <h1 className="my-4 fw-bold" style={{ color: '#6B92FA', fontStyle: 'Roboto' }}>Post a New Job</h1>
           <Formik
             initialValues={{
               jobTitle: '',
               companyName: '',
               jobType: 'Full Time',
               jobCategory: 'Technical',
-              jobTags: '',
+              
               jobExperience: '0-1',
               jobQualification: '',
               requiredSkills: '',
-              jobRole: '',
+              
               jobCity: '',
               email: '',
               phone: '',
-              postedOn: '',
+              
               lastDate: '',
-              responsibilities: '',
-              requirements: '',
+              
               jobDescription: '',
               salary: '',
               applicationUrl: ''
@@ -94,7 +93,7 @@ const HrPostJobs = () => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ errors, touched, handleChange, handleSubmit, isSubmitting }) => (
+            {({ values, errors, touched, handleChange, setFieldValue, handleSubmit, isSubmitting }) => (
               <Form onSubmit={handleSubmit}>
                 <Row className="mb-3">
                   <Col>
@@ -104,7 +103,27 @@ const HrPostJobs = () => {
                   </Col>
                   <Col>
                     <label htmlFor="companyName">Company Name *</label>
-                    <Field name="companyName" type="text" className={`form-control ${touched.companyName && errors.companyName ? 'is-invalid' : ''}`} placeholder="Enter Your Company Name" />
+                    <Field
+                      name="companyName"
+                      as="select"
+                      className={`form-control ${touched.companyName && errors.companyName ? 'is-invalid' : ''}`}
+                      onChange={(e) => {
+                        const selectedCompany = e.target.value;
+                        handleChange(e);
+                        if (selectedCompany !== 'Select Company Name' && companyDetails[selectedCompany]) {
+                          setFieldValue('email', companyDetails[selectedCompany].email);
+                          setFieldValue('phone', companyDetails[selectedCompany].phone);
+                        } else {
+                          setFieldValue('email', '');
+                          setFieldValue('phone', '');
+                        }
+                      }}
+                    >
+                      <option value="">Select Company name</option>
+                      {companyNames.map((company) => (
+                        <option key={company.companyName} value={company.companyName}>{company.companyName}</option>
+                      ))}
+                    </Field>
                     <ErrorMessage name="companyName" component="div" className="invalid-feedback" />
                   </Col>
                 </Row>
@@ -132,9 +151,9 @@ const HrPostJobs = () => {
 
                 <Row className="mb-3">
                   <Col>
-                    <label htmlFor="jobTags">Job Tags *</label>
-                    <Field name="jobTags" type="text" className={`form-control ${touched.jobTags && errors.jobTags ? 'is-invalid' : ''}`} placeholder="Enter Your Job Tags" />
-                    <ErrorMessage name="jobTags" component="div" className="invalid-feedback" />
+                    <label htmlFor="jobCity">Job City *</label>
+                    <Field name="jobCity" type="text" className={`form-control ${touched.jobCity && errors.jobCity ? 'is-invalid' : ''}`} placeholder="Enter Your Location" />
+                    <ErrorMessage name="jobCity" component="div" className="invalid-feedback" />
                   </Col>
                   <Col>
                     <label htmlFor="jobExperience">Job Experience *</label>
@@ -163,56 +182,27 @@ const HrPostJobs = () => {
 
                 <Row className="mb-3">
                   <Col>
-                    <label htmlFor="jobRole">Job Role *</label>
-                    <Field name="jobRole" type="text" className={`form-control ${touched.jobRole && errors.jobRole ? 'is-invalid' : ''}`} placeholder="Enter Your Role" />
-                    <ErrorMessage name="jobRole" component="div" className="invalid-feedback" />
-                  </Col>
-                  <Col>
-                    <label htmlFor="jobCity">Job City *</label>
-                    <Field name="jobCity" type="text" className={`form-control ${touched.jobCity && errors.jobCity ? 'is-invalid' : ''}`} placeholder="Enter Your Location" />
-                    <ErrorMessage name="jobCity" component="div" className="invalid-feedback" />
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Col>
                     <label htmlFor="email">Email *</label>
-                    <Field name="email" type="email" className={`form-control ${touched.email && errors.email ? 'is-invalid' : ''}`} placeholder="Enter Your Email" />
+                    <Field name="email" type="email" className={`form-control ${touched.email && errors.email ? 'is-invalid' : ''}`} placeholder="Enter Your Email" disabled={!!values.companyName && !!companyDetails[values.companyName]} />
                     <ErrorMessage name="email" component="div" className="invalid-feedback" />
                   </Col>
                   <Col>
                     <label htmlFor="phone">Phone *</label>
-                    <Field name="phone" type="text" className={`form-control ${touched.phone && errors.phone ? 'is-invalid' : ''}`} placeholder="Enter Your Phone" />
+                    <Field name="phone" type="text" className={`form-control ${touched.phone && errors.phone ? 'is-invalid' : ''}`} placeholder="Enter Your Phone" disabled={!!values.companyName && !!companyDetails[values.companyName]} />
                     <ErrorMessage name="phone" component="div" className="invalid-feedback" />
                   </Col>
                 </Row>
 
                 <Row className="mb-3">
                   <Col>
-                    <label htmlFor="postedOn">Posted On *</label>
-                    <Field name="postedOn" type="date" className={`form-control ${touched.postedOn && errors.postedOn ? 'is-invalid' : ''}`} />
-                    <ErrorMessage name="postedOn" component="div" className="invalid-feedback" />
+                    <label htmlFor="salary">Salary *</label>
+                    <Field name="salary" type="text" className={`form-control ${touched.salary && errors.salary ? 'is-invalid' : ''}`} placeholder="Ex: 3.2-5.5 LPA" />
+                    <ErrorMessage name="salary" component="div" className="invalid-feedback" />
                   </Col>
                   <Col>
                     <label htmlFor="lastDate">Last Date *</label>
                     <Field name="lastDate" type="date" className={`form-control ${touched.lastDate && errors.lastDate ? 'is-invalid' : ''}`} />
                     <ErrorMessage name="lastDate" component="div" className="invalid-feedback" />
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Col>
-                    <label htmlFor="responsibilities">Responsibilities *</label>
-                    <Field name="responsibilities" as="textarea" className={`form-control ${touched.responsibilities && errors.responsibilities ? 'is-invalid' : ''}`} placeholder="Enter Responsibilities" />
-                    <ErrorMessage name="responsibilities" component="div" className="invalid-feedback" />
-                  </Col>
-                </Row>
-
-                <Row className="mb-3">
-                  <Col>
-                    <label htmlFor="requirements">Requirements *</label>
-                    <Field name="requirements" as="textarea" className={`form-control ${touched.requirements && errors.requirements ? 'is-invalid' : ''}`} placeholder="Enter Requirements" />
-                    <ErrorMessage name="requirements" component="div" className="invalid-feedback" />
                   </Col>
                 </Row>
 
@@ -225,11 +215,6 @@ const HrPostJobs = () => {
                 </Row>
 
                 <Row className="mb-3">
-                  <Col>
-                    <label htmlFor="salary">Salary *</label>
-                    <Field name="salary" type="text" className={`form-control ${touched.salary && errors.salary ? 'is-invalid' : ''}`} placeholder="Ex: 3.2-5.5 LPA" />
-                    <ErrorMessage name="salary" component="div" className="invalid-feedback" />
-                  </Col>
                   <Col>
                     <label htmlFor="applicationUrl">Application Email/URL *</label>
                     <Field name="applicationUrl" type="text" className={`form-control ${touched.applicationUrl && errors.applicationUrl ? 'is-invalid' : ''}`} placeholder="https://peramsons.com" />

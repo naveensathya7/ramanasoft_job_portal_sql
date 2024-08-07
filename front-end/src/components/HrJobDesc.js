@@ -1,37 +1,60 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useTable, useSortBy, useGlobalFilter, usePagination } from 'react-table';
-import { FaFilePdf } from "react-icons/fa";
-import HrNavbar from './HrNavbar/HrNavbar';
-import * as XLSX from 'xlsx';
-import axios from 'axios';
-import StatusCell from './StatusCell'; // Import the StatusCell component
 import { Container, Row, Col, Button, Form, Table } from 'react-bootstrap'; // Import necessary components from react-bootstrap
+import StatusCell from './StatusCell';
+import { FaFilePdf } from "react-icons/fa";
+import * as XLSX from 'xlsx';
+import axios from 'axios'
+import ramana from '../images/p3.jpeg';
+import logo from '../images/avatar2.avif'
 
-const StudentsPlaced = () => {
-  const [data, setData] = useState([]); // State to store table data
-  const [selectedIds, setSelectedIds] = useState([]); // State to store selected application IDs
+const HrJobDesc = () => {
+  const { jobId} = useParams();
+  const [company, setCompany] = useState(null);
+  const[job,setJob]=useState({})
+  const [selectedIds, setSelectedIds] = useState([]);
+  const[data,setData]=useState([])
+  
+  useEffect(() => {
+    
+   fetchJobData()
+  }, []);
 
   useEffect(() => {
-    // Fetch data from the backend API
+    // Fetch job postings for the selected company
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/applications/qualified'); // Adjust the URL as needed
+        const response = await axios.get(`http://localhost:5000/applications/${jobId}`); // Adjust the URL as needed
         setData(response.data.map(item => ({ ...item, isEditing: false })));
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchData();
-  }, []);
+    
+      fetchData();
+    
+  }, [job]);
 
+  const fetchJobData = async () => {
+    try {
+        console.log("In method",jobId)
+      const response = await axios.get(`http://localhost:5000/view-jobs/${jobId}`);
+      console.log(response.data)
+      setJob(response.data);
+    } catch (error) {
+      console.error('Error fetching job data', error);
+      //setErrorMsg('No data found for the student.');
+    }
+  };
   const updateStatus = async (applicationIDs, status) => {
     try {
       // Update the status in the backend
-      await axios.put(`http://localhost:5000/applications/status`, { status, ids: applicationIDs });
+      await axios.put('http://localhost:5000/applications/status', { status, ids: applicationIDs });
 
       // Update the status in the frontend
-      if (Array.isArray(applicationIDs)){
+      if(Array.isArray(applicationIDs)){
         setData(prevData => prevData.map(app =>
           applicationIDs.includes(app.applicationID) ? { ...app, status, isEditing: false } : app
         ));
@@ -51,11 +74,51 @@ const StudentsPlaced = () => {
     ));
   };
 
-  
+  const handleCheckboxChange = (applicationID) => {
+    setSelectedIds(prevSelectedIds => {
+      if (prevSelectedIds.includes(applicationID)) {
+        return prevSelectedIds.filter(id => id !== applicationID);
+      } else {
+        return [...prevSelectedIds, applicationID];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === data.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(data.map(app => app.applicationID));
+    }
+  };
 
   const memoColumns = useMemo(() => [
-    
-    { Header: 'Full Name', accessor: 'fullName' },
+    {
+      Header: (
+        <Form.Check
+          type="checkbox"
+          onChange={handleSelectAll}
+          checked={selectedIds.length === data.length && data.length > 0}
+        />
+      ),
+      accessor: 'selection',
+      Cell: ({ row }) => (
+        <Form.Check
+          type="checkbox"
+          checked={selectedIds.includes(row.original.applicationID)}
+          onChange={() => handleCheckboxChange(row.original.applicationID)}
+        />
+      ),
+      disableSortBy: true,
+      disableGlobalFilter: true,
+    },
+    { Header: 'Full Name', accessor: 'fullName',
+      Cell: ({ row }) => (
+        <Link to={`/student/${row.original.candidateID}`}>
+          {row.original.fullName}
+        </Link>
+      )
+     },
     { Header: 'Contact Number', accessor: 'mobileNo' },
     { Header: 'Email', accessor: 'email' },
     { Header: 'Job Role', accessor: 'jobRole' },
@@ -63,24 +126,14 @@ const StudentsPlaced = () => {
     {
       Header: 'Status',
       accessor: 'status',
-      Cell: ({ value }) => {
-        let color;
-        switch (value) {
-          case 'In progress':
-            color = 'yellow';
-            break;
-          case 'Qualified':
-            color = 'green';
-            break;
-          case 'Not Qualified':
-            color = 'red';
-            break;
-          default:
-            color = 'blue';
-        }
-        return <span style={{ color, fontWeight: '600' }}>{value}</span>;
-      }
-      
+      Cell: ({ row, value }) => (
+        <StatusCell
+          value={value}
+          row={{ ...row, toggleEditing }}
+          updateStatus={updateStatus}
+          isEditing={row.original.isEditing}
+        />
+      )
     },
     { Header: 'Y.O.P', accessor: 'passedOut' },
     { Header: 'Gender', accessor: 'gender' },
@@ -174,11 +227,35 @@ const StudentsPlaced = () => {
     }
     return pageNumbers;
   };
-
+  
   return (
     <>
-      <HrNavbar />
-      <Container fluid className='py-5' style={{ fontFamily: 'Calibri',width:'90vw' }}>
+    <div>
+    <img src={ramana} alt='logo' className='rounded mt-3 ms-3' style={{width:'200px'}}/>
+    <div style={{float:'right'}} className='p-3 rounded me-3'>
+      <img src={logo} alt='profile' className='rounded' style={{width:'50px',height:'50px'}}/>
+    </div>
+    </div>
+    <h3 className='text-center fw-bold text-decoration-underline'>Job description </h3>
+    <Container className='border p-3 rounded shadow mt-5'>
+      <h1 className='fw-bold'>{job.companyName}</h1>
+      <p><strong>Job ID:</strong> {job.jobId}</p>
+      <p><strong>Job Title:</strong>{job.jobTitle} </p>
+      <p><strong>Job Category:</strong> {job.jobCategory}</p>
+      <p><strong>Job Type:</strong> {job.jobType}</p>
+      <p><strong>City:</strong> {job.Location}</p>
+      <p><strong>Experience :</strong> {job.jobExperience}</p>
+      <p><strong>Qualification :</strong>{job.jobQualification}</p>
+      <p><strong>Salary :</strong> {job.salary}</p>
+      <p><strong>Description :</strong>{job.jobDescription}</p>
+      <p><strong>Last date:</strong>{job.lastDate}</p>
+      <h5 className='fw-bold text-danger mb-3'>Posted by:{job.postedBy}</h5>
+      <div className='d-flex justify-content-around w-25'>
+      <Button variant="secondary" className='px-5'><Link to='/dashboard' className='text-decoration-none text-dark fw-bold text-white text-nowrap'><i class="fa-solid fa-left-long"></i> Back</Link></Button>
+      <Button variant="primary" className='fw-bold ms-2 px-5'><Link to='/apply-job' className='text-decoration-none text-dark fw-bold text-nowrap text-white'>Apply Now</Link></Button>
+      </div>
+    </Container>
+    {data.length>0?(<Container fluid className='py-5' style={{ fontFamily: 'Calibri',width:'90vw' }}>
         <Row className='mb-3'>
           <Col>
             <h1>Students Applied</h1>
@@ -226,49 +303,69 @@ const StudentsPlaced = () => {
               Download Complete Data as Excel
             </Button>
           </Col>
+          <Col md={6} xs={8} lg={4} className="d-flex justify-content-end">
+            
+          <select onChange={(e) => updateStatus(selectedIds, e.target.value)} className='me-2' style={{ height: '30px', border: '1px solid #737478', outline: 'none', borderRadius: '2px' }}>
+              <option value="">Change Status</option>
+              <option value="applied">Applied</option>
+              <option value="qualified">Qualified</option>
+              <option value="placed">Placed</option>
+              <option value="not-placed">Not Placed</option>
+              <option value="not-attended">Not Attended</option>
+              <option value="not-interested">Not Interested</option>
+              <option value="not-eligible">Not Eligible</option>
+              <option value="eligible">Eligible/Profile Sent</option>
+              <option value="under-progress">Yet to Receive Feedback</option>
+              <option value="level-1">Level 1</option>
+              <option value="level-2">Level 2</option>
+              <option value="level-3">Level 3</option>
+            </select>
+          </Col>
           
         </Row>
         <Row>
-          <Col>
-            <Table {...getTableProps()} bordered hover responsive className='table-striped'>
-              <thead className='table-dark'>
-                {headerGroups.map(headerGroup => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
-                      <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                        {column.render('Header')}
-                        <span>
-                          {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
-                        </span>
-                      </th>
-                    ))}
+          <Col>{
+            data.length>0?(<Table {...getTableProps()} bordered hover responsive className='table-striped'>
+            <thead className='table-dark'>
+              {headerGroups.map(headerGroup => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map(column => (
+                    <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                      {column.render('Header')}
+                      <span>
+                        {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                      </span>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.map(row => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map(cell => {
+                      if (cell.column.id === 'resume') {
+                        return (
+                          <td {...cell.getCellProps()}>
+                            <FaFilePdf
+                              onClick={() => handleResumeDownload(row.original)}
+                              style={{ cursor: 'pointer' }}
+                              size={20}
+                            />
+                          </td>
+                        );
+                      }
+                      return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
+                    })}
                   </tr>
-                ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-                {page.map(row => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()}>
-                      {row.cells.map(cell => {
-                        if (cell.column.id === 'resume') {
-                          return (
-                            <td {...cell.getCellProps()}>
-                              <FaFilePdf
-                                onClick={() => handleResumeDownload(row.original)}
-                                style={{ cursor: 'pointer' }}
-                                size={20}
-                              />
-                            </td>
-                          );
-                        }
-                        return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                      })}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </Table>
+                );
+              })}
+            </tbody>
+          </Table>):(<p>No data to show</p>)
+          }
+            
           </Col>
         </Row>
         <Row className='d-flex justify-content-between mt-3'>
@@ -284,9 +381,17 @@ const StudentsPlaced = () => {
           
           
         </Row>
-      </Container>
+      </Container>):(<p className='text-center'>No applied candidates</p>)}
+      
+      
     </>
   );
+
+  
+
+
+
+  
 };
 
-export default StudentsPlaced;
+export default HrJobDesc;

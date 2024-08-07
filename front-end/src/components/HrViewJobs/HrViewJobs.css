@@ -35,3 +35,6 @@
     padding-left: auto;
     box-sizing: border-box;
 }
+.job-card{
+    text-decoration: none;
+}

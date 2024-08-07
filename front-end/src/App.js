@@ -1,16 +1,12 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Home from './components/Home';
-import About from './components/About';
-import Contact from './components/Contact';
-import Hire from './components/Hire';
-import StaffHire from './components/StaffHire';
-import Registration from './components/Registration';
+
+
+
 import RegistrationRequests  from './components/RegistrationRequests/RegistrationRequests';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Login from './components/Login';
-import DashBoard from './components/DashBoard';
+
 import HrDashBoard from './components/HRDashboard/HrDashboard';
 import HrRegistration from './components/HrRegistration/HrRegistration';
 import HrLogin from './components/HrLogin';
@@ -18,12 +14,20 @@ import PostJobs from './components/HrPostJobs/HrPostJobs';
 import HrRegistrationRequests from './components/HrRegistrationRequests/HrRegistrationRequests';
 import HrProfile from './components/HrProfile/HrProfile';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
 import HrViewJobs from './components/HrViewJobs/HrViewJobs';
 import HrPastJobs from './components/HrPastJobs/HrPastJobs';
 import StudentsApplied from './components/StudentsApplied';
 import StudentsQualified from './components/StudentsQualified'
 import StudentsPlaced from './components/StudentsPlaced';
 import StudentsNotPlaced from './components/StudentsNotPlaced'
+import StudentsNotAttended from './components/StudentsNotAttended'
+import StudentsNotEligible from './components/StudentsNotEligible'
+import StudentsNotInterested from './components/StudentsNotInterested'
+import HrLeads from './components/JobStatus/HrLeads'
+import JdReceived from './components/JobStatus/JdReceived';
+import AddHr from './components/JobStatus/AddHr';
+import JobStatus from './components/JobStatus/JobStatus';
 import CreateDash from './components/Quiz/Admin/quiz/QuizCreate/CreateDash';
 import QuizCreationPage from './components/Quiz/editor';
 import HomePage from './components/Quiz/home/home';
@@ -39,6 +43,10 @@ import QuizResults from './components/Quiz/Admin/results';
 import ResponsePage from './components/Quiz/Admin/quiz/QuizCreate/Analyze/ResponsePage';
 import UserQuizAnalysis from './components/Quiz/intern/userAnalyze';
 import QuizDash from './components/Quiz/Admin/quiz/quizdash';
+import StudentsEligible from './components/StudentsEligible';
+import StudentDetails from './components/StudentData';
+import CompanyData from './components/CompanyData';
+import HrJobDesc from './components/HrJobDesc';
 
 const hrDetails = {
   companyName: 'Ramanasoft',
@@ -54,14 +62,7 @@ function App() {
     <div className=''>
        <BrowserRouter>
        <Routes>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/about' element={<About/>}/>
-        <Route path='/contact' element={<Contact/>}/>
-        <Route path='/hire' element={<Hire/>}/>
-        <Route path='/about-staff-hiring' element={<StaffHire/>}/>
-        <Route path='/registration' element={<Registration/>}/>
-        <Route path='/login' element={<Login/>}/>
-        <Route path='/dashboard' element={<DashBoard/>}/>
+        
         <Route path='/hr-dashboard' element={<HrDashBoard/>}/>
         <Route path='/hr-registration' element={<HrRegistration/>}/>
         <Route path='/hr-login' element={<HrLogin/>}/>
@@ -75,6 +76,17 @@ function App() {
         <Route path="/hr-dashboard/students-qualified" element={<StudentsQualified/>} />
         <Route path="/hr-dashboard/students-placed" element={<StudentsPlaced/>} />
        <Route path="/hr-dashboard/students-not-placed" element={<StudentsNotPlaced/>} />
+       <Route path="/hr-dashboard/not-attended" element={<StudentsNotAttended/>} />
+       <Route path="/hr-dashboard/not-interested-students" element={<StudentsNotInterested/>} />
+       <Route path="/hr-dashboard/not-eligible" element={<StudentsNotEligible/>} />
+       <Route path="/hr-dashboard/eligible" element={<StudentsEligible/>}/>
+       <Route path="/hr-dashboard/hr-leads" element={<HrLeads/>}/>
+       <Route path="/hr-dashboard/jd-received" element={<JdReceived />} />
+       <Route path="/hr-dashboard/companies/:status" element={<JobStatus/>}/>
+       <Route path="/student/:candidateID" element={<StudentDetails/>}/>
+       <Route path="/companies/:companyID" element={<CompanyData/>}/>
+       <Route path="/hr-dashboard/job/:jobId" element={<HrJobDesc/>}/>
+       <Route path="/hr-dashboard/add-hr" element={<AddHr/>}/>
        <Route path = "/hr-dashboard/quiz" element ={< QuizDash />} />
 
         {/*<Route path="/hr-dashboard/hr-leads" element={<HrLeads/>} />

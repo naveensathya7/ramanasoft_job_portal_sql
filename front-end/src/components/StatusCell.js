@@ -22,10 +22,22 @@ const StatusCell = ({ value, row, updateStatus, isEditing }) => {
           value={value}
           onChange={(e) => updateStatus(row.original.applicationID, e.target.value)}
         >
-          <option value="In Progress">In Progress</option>
+          <option value="Applied">Applied</option>
           <option value="Qualified">Qualified</option>
           <option value="Not Qualified">Not Qualified</option>
           <option value="Placed">Placed</option>
+          
+              
+              
+              <option value="Not Placed">Not Placed</option>
+              <option value="Not Attended">Not Attended</option>
+              <option value="Not Interested">Not Interested</option>
+              <option value="Not Eligible">Not Eligible</option>
+              <option value="Eligible">Eligible/Profile Sent</option>
+              <option value="Under Progress">Yet to Receive Feedback</option>
+              <option value="Level 1">Level 1</option>
+              <option value="Level 2">Level 2</option>
+              <option value="Level 3">Level 3</option>
         </select>
       ) : (
         <>

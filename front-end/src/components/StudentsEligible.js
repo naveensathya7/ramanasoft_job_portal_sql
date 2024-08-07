@@ -7,7 +7,7 @@ import axios from 'axios';
 import StatusCell from './StatusCell'; // Import the StatusCell component
 import { Container, Row, Col, Button, Form, Table } from 'react-bootstrap'; // Import necessary components from react-bootstrap
 
-const StudentsPlaced = () => {
+const StudentsEligible = () => {
   const [data, setData] = useState([]); // State to store table data
   const [selectedIds, setSelectedIds] = useState([]); // State to store selected application IDs
 
@@ -15,7 +15,7 @@ const StudentsPlaced = () => {
     // Fetch data from the backend API
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/applications/qualified'); // Adjust the URL as needed
+        const response = await axios.get('http://localhost:5000/applications/eligible'); // Adjust the URL as needed
         setData(response.data.map(item => ({ ...item, isEditing: false })));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -289,4 +289,4 @@ const StudentsPlaced = () => {
   );
 };
 
-export default StudentsPlaced;
+export default StudentsEligible;

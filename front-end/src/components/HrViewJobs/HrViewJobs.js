@@ -7,7 +7,9 @@ import { FaCheck, FaTimes } from 'react-icons/fa';
 import { MdEdit, MdDelete } from 'react-icons/md';
 import HrNavbar from '../HrNavbar/HrNavbar';
 import EditJobModal from '../EditJobModal/EditJobModal';
+import { useNavigate,Link} from 'react-router-dom';
 import './HrViewJobs.css';
+
 
 const HrViewJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -16,6 +18,7 @@ const HrViewJobs = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [sortCriteria, setSortCriteria] = useState('');
+  const navigate=useNavigate()
 
   useEffect(() => {
     fetchJobs();
@@ -109,6 +112,8 @@ const HrViewJobs = () => {
     return `${year}-${month}-${day}`;
   };
 
+  
+
   return (
     <div style={{ overflowY: 'scroll',height:'150vh',paddingBottom:'10px' }}>
       <HrNavbar />
@@ -139,7 +144,8 @@ const HrViewJobs = () => {
         {filteredJobs.length > 0 ? (
           <Row xs={1} sm={1} md={2} lg={3} className="g-4">
             {filteredJobs.map(job => (
-              <Col key={job.jobId}>
+              <Link className="job-card" key={job.jobId} to={`/hr-dashboard/job/${job.jobId}`}>
+              <Col>
                 <div className="card h-100" style={{ boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)' }}>
                   <div className="card-body">
                     <h5 className="card-title fw-bold">{job.jobRole}</h5>
@@ -165,7 +171,8 @@ const HrViewJobs = () => {
                     </div>
                   </div>
                 </div>
-              </Col>
+              </Col></Link>
+              
             ))}
           </Row>
         ) : (

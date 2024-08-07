@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const env = require('dotenv');
-const bcrypt = require("bcrypt");
+//const bcrypt = require("bcrypt");
 const axios = require('axios');
 const cron = require("node-cron");
 const crypto = require('crypto');
@@ -96,24 +96,6 @@ const createRequestId = async(jobDetails) => {
   };
 };
 
-const generateStudentId = async () => {
-        const jobId = await query('SELECT MAX(candidateID) AS id FROM interns;')
-        console.log(jobId)
-        let createdId=0
-        if(jobId[0][0].id===null){
-          createdId=1
-        }
-        else{
-          createdId=jobId[0][0].id+1
-        }
-        //const count = rows[0].count;
-        //console.log(rows)
-       // console.log(count)
-        //const idNumber = await(createdId).toString().padStart(3, '0');
-        //console.log(idNumber)
-        return `RS${createdId}`;
-  
-};
 
 // Email sending function
 const SendEmail = async (email) => {
@@ -141,7 +123,7 @@ const moveExpiredJobs = async () => {
   try {
     const today = new Date();
     console.log("Cron runned");
-    const [expiredJobs] = await query('SELECT * FROM jobs WHERE lastDate < ?', [today]);
+    const expiredJobs = await query('SELECT * FROM jobs WHERE lastDate < ?', [today]);
     for (const job of expiredJobs) {
       await query('INSERT INTO past_jobs SET ?', { ...job, movedOn: today });
       await query('DELETE FROM jobs WHERE jobId = ?', [job.jobId]);
@@ -153,19 +135,125 @@ const moveExpiredJobs = async () => {
 };
 
 cron.schedule('59 10 * * *', moveExpiredJobs);
-app.put("/applications/:id/status",async(req,res)=>{
+/*app.put("/applications/:id/status",async(req,res)=>{
   const{status}=req.body
   const{id}=req.params
   console.log(status,id)
   try{
-    const [result]=await query('UPDATE applied_Students SET status=? WHERE applicationID=?',[status,id])
+    const result=await query('UPDATE applied_Students SET status=? WHERE applicationID=?',[status,id])
     console.log(result)
     res.status(200).json({message:"Status Changed Successfully"})
   }catch(err){
     console.error(err)
     res.status(500).json({message:"Server Error"})
   }
+})*/
+
+
+app.get("/applicant-history/",async(req,res)=>{
+  const { candidateID='', name='', email="", mobileNumber=""} = req.query;
+  console.log(candidateID,email,name,mobileNumber)
+  try{
+    const result=await query(`SELECT * FROM interns WHERE candidateID='${candidateID}' OR fullName='${name}' OR email='${email}' OR mobileNo='${mobileNumber}'`)
+      if (result){
+        res.status(200).json(result[0])
+      }
+      else{
+        res.status(404).json({message:"No user found"})
+      }
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+  
+  
+
 })
+
+app.post('/add-hr',async (req, res) => {
+  console.log(req.body)
+  const{companyName,website,phoneNumber,email,address,hrName,publishedHr}=req.body
+  
+  //console.log(req.body)
+  
+ 
+  try {
+    
+    // Insert application into the database
+    await query(
+      'INSERT INTO companies (companyName,website,mobileNo,email,address,hrName,publishedHr,publishedHrID) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [companyName,website, phoneNumber,email, address, hrName, publishedHr, 'RSHR-03']
+    );
+    res.status(200).json({ message: 'Company registered successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+    
+});
+
+app.get("/registered-companies", async(req,res)=>{
+console.log("companies")
+  try{
+    const result=await query('SELECT * FROM companies')
+    console.log(result)
+    res.status(200).json(result)
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+})
+
+
+app.put("/jobs/status", async (req, res) => {
+  const { status, ids } = req.body;
+  console.log(status, ids);
+
+  try {
+    // Check if ids is an array
+    if (Array.isArray(ids)) {
+      const placeholders = ids.map(() => '?').join(',');
+      const queryStr = `UPDATE jobs SET status=? WHERE jobId IN (${placeholders})`;
+      const result = await query(queryStr, [status, ...ids]);
+      console.log(result);
+    } else {
+      const result = await query('UPDATE jobs SET status=? WHERE jobId=?', [status, ids]);
+      console.log(result);
+    }
+
+    res.status(200).json({ message: "Status Changed Successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+    
+});
+
+
+app.put("/applications/status", async (req, res) => {
+  const { status, ids } = req.body;
+  console.log(status, ids);
+
+  try {
+    // Check if ids is an array
+    if (Array.isArray(ids)) {
+      const placeholders = ids.map(() => '?').join(',');
+      const queryStr = `UPDATE applied_Students SET status=? WHERE applicationID IN (${placeholders})`;
+      const result = await query(queryStr, [status, ...ids]);
+      console.log(result);
+    } else {
+      const result = await query('UPDATE applied_Students SET status=? WHERE applicationID=?', [status, ids]);
+      console.log(result);
+    }
+
+    res.status(200).json({ message: "Status Changed Successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+
 app.post('/apply', upload.single('resume'), async (req, res) => {
   const { fullName,jobRole, email,companyName, technology, mobileNo, gender, passedOut, experience, status } = req.body;
   //console.log(req.body)
@@ -215,10 +303,16 @@ app.get('/download-resume/:id', async (req, res) => {
   }
 });
 
-app.get('/applications', async (req, res) => {
+app.get('/applications/:jobId', async (req, res) => {
+  const{jobId}=req.params;
+  
+ 
+  
+    const sql = `SELECT * FROM applied_students where jobId='${jobId}'`;
+  
   //console.log("got  here")
-  const sql = 'SELECT * FROM applied_Students';
-
+  
+  
   try {
     const rows = await query(sql);
 
@@ -235,18 +329,110 @@ app.get('/applications', async (req, res) => {
   }
 });
 
+app.get('/applications', async (req, res) => {
+  const{companyName}=req.query;
+  console.log("Company name",companyName)
+  let sql;
+  if (companyName==''){
+    sql = 'SELECT * FROM applied_students';
+  }else{
+    sql = `SELECT * FROM applied_students where companyName='${companyName}'`;
+  }
+  //console.log("got  here")
+  
+  console.log(sql)
+  try {
+    const rows = await query(sql);
+
+    // Encode binary data to base64
+    const response = rows.map(row => ({
+      ...row,
+      resume: row.resume ? row.resume.toString('base64') : null
+    }));
+
+    res.status(200).json(response); // Send back the modified rows
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+app.get('/applicant-history/:candidateId', async (req, res) => {
+  const{candidateId}=req.params
+  console.log("Ok")
+  
+  console.log("k")
+
+  const sql_q = `SELECT * FROM applied_students WHERE candidateID='${candidateId}'`;
+  console.log(sql_q)
+  try {
+    const rows = await query(sql_q);
+    console.log(rows)
+    // Encode binary data to base64
+    const response = rows.map(row => ({
+      ...row,
+      resume: row.resume ? row.resume.toString('base64') : null
+    }));
+    console.log(response)
+    res.status(200).json(response); // Send back the modified rows
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+app.get("/company-history/",async(req,res)=>{
+  const { companyID='', name='', email="", mobileNumber=""} = req.query;
+  //console.log(candidateID,email,name,mobileNumber)
+  console.log(companyID)
+  try{
+    const result=await query(`SELECT * FROM companies WHERE companyID='${companyID}'`)
+      if (result){
+        res.status(200).json(result[0])
+      }
+      else{
+        res.status(404).json({message:"No user found"})
+      }
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+  
+  
+
+})
+
+app.get('/company-history/:companyID', async (req, res) => {
+  const{companyID}=req.params
+  console.log("Searching company details")
+
+  const sql_q = `SELECT * FROM jobs WHERE companyID='${companyID}'`;
+  console.log(sql_q)
+  try {
+    const rows = await query(sql_q);
+    console.log(rows)
+    // Encode binary data to base64
+    
+    //console.log(response)
+    res.status(200).json(rows); // Send back the modified rows
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
 app.get('/statistics/:status',async(req,res)=>{
   const {status}=req.params
   try{
     let  result;
     if(status==='applied'){
-      [result]=await query('SELECT COUNT(*) as count FROM applied_Students;')
+      [result]=await query('SELECT COUNT(*) as count FROM applied_students;')
 
     }
     else{
-      [result]=await query(`SELECT COUNT(*) as count FROM applied_Students WHERE status='${status}'`)
+      [result]=await query(`SELECT COUNT(*) as count FROM applied_students WHERE status='${status}'`)
     }
-    console.log(result.count)
+    //console.log(result.count)
 
     res.status(200).json(result); // Send back the modified rows
   } catch (err) {
@@ -257,7 +443,7 @@ app.get('/statistics/:status',async(req,res)=>{
 
 app.get('/applications/:status', async (req, res) => {
   const{status}=req.params
-  console.log("got  here")
+  //console.log("got  here")
   const sql = `SELECT * FROM applied_Students WHERE status="${status}"`;
 
   try {
@@ -318,6 +504,8 @@ app.post("/signup-hr", async (req, res) => {
     res.status(500).json({ message: 'Server Error' });
   }
 });
+
+app.get
 //LOGIN API for HR
 app.post("/login-hr", async (req, res) => {
   const { mobileNo } = req.body;
@@ -354,14 +542,13 @@ app.post("/post-job", async (req, res) => {
      
     // Build the SELECT query to check for duplicates
     const rows = await query(`
-      SELECT * FROM jobs WHERE jobRole = ? AND companyName = ? AND Location = ? AND jobCategory = ? AND jobTags = ? 
-      AND jobExperience = ? AND jobQualification = ? AND email = ? AND phone = ? AND postedOn = ? AND lastDate = ? 
-      AND requirements = ? AND responsibilities = ? AND jobDescription = ? AND salary = ? AND applicationUrl = ? 
+      SELECT * FROM jobs WHERE companyName = ? AND Location = ? AND jobCategory = ? AND  jobExperience = ? AND jobQualification = ? AND email = ? AND phone = ?  AND lastDate = ? 
+      AND  jobDescription = ? AND salary = ? AND applicationUrl = ? 
       AND requiredSkills = ? AND jobType = ? AND jobTitle = ?`, 
       [
-        job.jobRole, job.companyName, job.jobCity, job.jobCategory, job.jobTags,
-        job.jobExperience, job.jobQualification, job.email, job.phone, job.postedOn, job.lastDate,
-        job.requirements, job.responsibilities, job.jobDescription, job.salary, job.applicationUrl,
+        job.companyName, job.jobCity, job.jobCategory,
+        job.jobExperience, job.jobQualification, job.email, job.phone,job.lastDate,
+        job.jobDescription, job.salary, job.applicationUrl,
         job.requiredSkills, job.jobType, job.jobTitle
       ]);
       /*console.log('INSERT INTO jobs (jobRole,companyName,Location,jobCategory,jobTags, jobExperience,jobQualification,email,phone,postedOn,lastDate, requirements,responsibilities,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
@@ -374,10 +561,10 @@ app.post("/post-job", async (req, res) => {
     if (rows.length > 0) {
       return res.status(400).json({ message: 'Duplicate job entry detected, job not posted.' });
     }
-    await query('INSERT INTO jobs (jobRole,companyName,Location,jobCategory,jobTags, jobExperience,jobQualification,email,phone,postedOn,lastDate, requirements,responsibilities,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [
-      job.jobRole, job.companyName, job.jobCity, job.jobCategory, job.jobTags,
-      job.jobExperience, job.jobQualification, job.email, job.phone, job.postedOn, job.lastDate,
-      job.requirements, job.responsibilities, job.jobDescription, job.salary, job.applicationUrl,
+    await query('INSERT INTO jobs (companyName,Location,jobCategory,jobExperience,jobQualification,email,phone,postedOn,lastDate,jobDescription ,salary,applicationUrl ,requiredSkills,jobType,jobTitle) VALUES(?,?,?,?,?,?,?,NOW(),?,?,?,?,?,?,?)', [
+      job.companyName, job.jobCity, job.jobCategory,
+      job.jobExperience, job.jobQualification, job.email, job.phone, Date(), job.lastDate,
+      job.jobDescription, job.salary, job.applicationUrl,
       job.requiredSkills, job.jobType, job.jobTitle
     ]);
     res.status(201).json({ message: 'Job posted successfully' });
@@ -468,6 +655,17 @@ app.get("/intern-requests", async (req, res) => {
   }
 });
 
+app.get("/view-companies", async (req, res) => {
+  try {
+    const jobs = await query('SELECT * FROM companies');
+    console.log("Jobs",jobs)
+    res.status(200).json(jobs);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 app.get("/view-jobs", async (req, res) => {
   try {
     const jobs = await query('SELECT * FROM jobs');
@@ -476,6 +674,57 @@ app.get("/view-jobs", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+app.get("/view-jobs/:jobId", async (req, res) => {
+  const{jobId}=req.params
+  console.log(jobId)
+  try {
+    const jobs = await query(`SELECT * FROM jobs where jobId=${jobId}`);
+    console.log(jobs)
+    res.status(200).json(jobs[0]);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.get('/view-jobs/:status', async (req, res) => {
+  const{status}=req.params
+  //console.log("got  here")
+  const sql = `SELECT * FROM jobs WHERE status="${status}"`;
+
+  try {
+    const rows = await query(sql);
+
+    // Encode binary data to base64
+    
+
+    res.status(200).json(rows); // Send back the modified rows
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+app.get('/job-statistics/:status',async(req,res)=>{
+  const {status}=req.params
+  console.log("API called")
+  try{
+    let  result;
+    if(status==='hr-leads'){
+      [result]=await query('SELECT COUNT(*) as count FROM jobs;')
+
+    }
+    else{
+      [result]=await query(`SELECT COUNT(*) as count FROM jobs WHERE status='${status}'`)
+    }
+    console.log("Status:",status,result.count)
+
+    res.status(200).json(result); // Send back the modified rows
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+})
 
 app.get("/past-jobs", async (req, res) => {
   try {
@@ -603,7 +852,7 @@ app.delete('/delete-job/:jobId', async (req, res) => {
   console.log(jobId)
   
   try {
-    const [result] = await query(`DELETE FROM jobs WHERE jobId = ${jobId}`);
+    const result = await query(`DELETE FROM jobs WHERE jobId = ${jobId}`);
     console.log(result)
     if (result.affectedRows === 1) {
       res.status(201).json({ message: 'Job deleted successfully' });

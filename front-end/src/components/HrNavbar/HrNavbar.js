@@ -21,7 +21,7 @@ const HrNavbar=()=>{
       }
 
     return(  
-        <Navbar bg="#B3C8CF" expand="lg" style={{width:'100%',justifyContent:'center',paddingLeft:'0px',backgroundColor:'#526D82',color:'white',zIndex:1}}>
+        <Navbar bg="#B3C8CF" expand="lg" style={{width:'100vw',justifyContent:'center',paddingLeft:'0px',backgroundColor:'#526D82',color:'white',zIndex:1}}>
           <Container  style={{width: '100vw'}}>
             <Link to="/hr-dashboard"><Navbar.Brand href="#home">
               <img
