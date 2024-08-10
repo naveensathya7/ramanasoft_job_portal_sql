@@ -18,12 +18,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import HrViewJobs from './components/HrViewJobs/HrViewJobs';
 import HrPastJobs from './components/HrPastJobs/HrPastJobs';
 import StudentsApplied from './components/StudentsApplied';
-import StudentsQualified from './components/StudentsQualified'
+
 import StudentsPlaced from './components/StudentsPlaced';
-import StudentsNotPlaced from './components/StudentsNotPlaced'
-import StudentsNotAttended from './components/StudentsNotAttended'
-import StudentsNotEligible from './components/StudentsNotEligible'
-import StudentsNotInterested from './components/StudentsNotInterested'
+
 import HrLeads from './components/JobStatus/HrLeads'
 import JdReceived from './components/JobStatus/JdReceived';
 import AddHr from './components/JobStatus/AddHr';
@@ -43,7 +40,7 @@ import QuizResults from './components/Quiz/Admin/results';
 import ResponsePage from './components/Quiz/Admin/quiz/QuizCreate/Analyze/ResponsePage';
 import UserQuizAnalysis from './components/Quiz/intern/userAnalyze';
 import QuizDash from './components/Quiz/Admin/quiz/quizdash';
-import StudentsEligible from './components/StudentsEligible';
+
 import StudentDetails from './components/StudentData';
 import CompanyData from './components/CompanyData';
 import HrJobDesc from './components/HrJobDesc';
@@ -60,10 +57,11 @@ const hrDetails = {
 function App() {
   return (
     <div className=''>
+      
        <BrowserRouter>
        <Routes>
         
-        <Route path='/hr-dashboard' element={<HrDashBoard/>}/>
+        <Route path='/*' element={<HrDashBoard/>}/>
         <Route path='/hr-registration' element={<HrRegistration/>}/>
         <Route path='/hr-login' element={<HrLogin/>}/>
         <Route path="/hr-dashboard/registration-requests" element={<RegistrationRequests/>}/>
@@ -73,13 +71,10 @@ function App() {
         <Route path="/superadmin-dashboard/hr-requests" element={<HrRegistrationRequests/>}/>
         <Route path="/hr-dashboard/profile" element={<HrProfile hrDetails={hrDetails}/>}/>
         <Route path="/hr-dashboard/students-applied" element={<StudentsApplied/>} />
-        <Route path="/hr-dashboard/students-qualified" element={<StudentsQualified/>} />
-        <Route path="/hr-dashboard/students-placed" element={<StudentsPlaced/>} />
-       <Route path="/hr-dashboard/students-not-placed" element={<StudentsNotPlaced/>} />
-       <Route path="/hr-dashboard/not-attended" element={<StudentsNotAttended/>} />
-       <Route path="/hr-dashboard/not-interested-students" element={<StudentsNotInterested/>} />
-       <Route path="/hr-dashboard/not-eligible" element={<StudentsNotEligible/>} />
-       <Route path="/hr-dashboard/eligible" element={<StudentsEligible/>}/>
+        
+        <Route path="/hr-dashboard/students/:status" element={<StudentsPlaced/>} />
+       
+       
        <Route path="/hr-dashboard/hr-leads" element={<HrLeads/>}/>
        <Route path="/hr-dashboard/jd-received" element={<JdReceived />} />
        <Route path="/hr-dashboard/companies/:status" element={<JobStatus/>}/>

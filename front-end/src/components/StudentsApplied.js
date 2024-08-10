@@ -7,7 +7,9 @@ import * as XLSX from 'xlsx';
 import axios from 'axios';
 import StatusCell from './StatusCell'; // Import the StatusCell component
 import { Container, Row, Col, Button, Form, Table } from 'react-bootstrap'; // Import necessary components from react-bootstrap
+const statusInfo={'applied':'Applied','qualified':'Qualified','placed':'Placed','not-placed':'Not Placed','not-attended':'Not Attended','not-interested':'Not Interested','not-eligible':'Not Eligible','eligible':'Eligible/Profile Sent','under-progress':'Yet to receive feedback','level-1':'Level 1','level-2':'Level 2','level-3':'Level 3'}
 
+const HrId='RSHR-02'
 const JobApplicationsTable = () => {
   const [data, setData] = useState([]); // State to store table data
   const [selectedIds, setSelectedIds] = useState([]);
@@ -31,7 +33,7 @@ const JobApplicationsTable = () => {
     // Fetch job postings for the selected company
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/applications?companyName=${selectedCompany}`); // Adjust the URL as needed
+        const response = await axios.get(`http://localhost:5000/applications?companyName=${selectedCompany}&hrId=${HrId}`); // Adjust the URL as needed
         setData(response.data.map(item => ({ ...item, isEditing: false })));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -125,7 +127,7 @@ const JobApplicationsTable = () => {
     },
     { Header: 'Full Name', accessor: 'fullName',
       Cell: ({ row }) => (
-        <Link to={`/student/${row.original.candidateID}`}>
+        <Link style={{textDecoration:'none',color:'#53289e',fontWeight:'800'}} to={`/student/${row.original.candidateID}`}>
           {row.original.fullName}
         </Link>
       )
@@ -306,6 +308,7 @@ const JobApplicationsTable = () => {
               <option value="level-1">Level 1</option>
               <option value="level-2">Level 2</option>
               <option value="level-3">Level 3</option>
+              
             </select>
           </Col>
           <Col md={6} className='d-flex '>

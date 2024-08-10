@@ -1,5 +1,5 @@
 import React, { useMemo,useEffect, useState } from 'react';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useNavigate,useLocation,Link } from 'react-router-dom';
 import { Card, Button, Container, Row, Col,Table,Form,Dropdown,DropdownButton } from 'react-bootstrap';
 
 import { IoPersonAddSharp } from "react-icons/io5";
@@ -12,20 +12,22 @@ import './HrDashboard.css';
 //import { isTransparent } from 'html2canvas/dist/types/css/types/color';
 const filteredCandidates=[{_id:'587345874',fullName:'Naveen',email:'naveensathya.vanamoju@gmail.com',mobileNo:'9515982621',batchNo:'08',domain:'MERN stack'}]
 //const filteredCandidates=[]
+
+const HrId="RSHR-02"
 const HrPortal = () => {
 
   const location = useLocation();
   
-  
+  const HrId="RSHR-02"
   const [statistics, setStatistics] = useState([
     { title: 'Total Students Applied', value: 0, link: '/hr-dashboard/students-applied', color: '#37a6b8', element: IoPersonAddSharp },
-    { title: 'Total Students Qualified', value: 0, link: '/hr-dashboard/students-qualified', color: '#e8c93f', element: FaCheck },
-    { title: 'Total Students Placed', value: 0, link: '/hr-dashboard/students-placed', color: '#21bf40', element: FaUserTie },
-    { title: 'Total Students Not Placed', value: 0, link: '/hr-dashboard/students-not-placed', color: '#f73643', element: FaTimes },
-    { title: 'Total Students Not Attended', value: 0, link: '/hr-dashboard/not-attended', color: '#838485', element: IoPersonAddSharp },
-    { title: 'Total Students Not Interested', value: 0, link: '/hr-dashboard/not-interested-students', color: '#21bf40', element: FaCheck },
-    { title: 'Not Eligible', value: 0, link: '/hr-dashboard/not-eligible', color: '#3377f5', element: FaUserTie },
-    { title: 'Eligible/ Profile Sent', value: 0, link: '/hr-dashboard/eligible', color: '#49494a', element: FaTimes }
+    { title: 'Total Students Qualified', value: 0, link: '/hr-dashboard/students/qualified', color: '#e8c93f', element: FaCheck },
+    { title: 'Total Students Placed', value: 0, link: '/hr-dashboard/students/placed', color: '#21bf40', element: FaUserTie },
+    { title: 'Total Students Not Placed', value: 0, link: '/hr-dashboard/students/not-placed', color: '#f73643', element: FaTimes },
+    { title: 'Total Students Not Attended', value: 0, link: '/hr-dashboard/students/not-attended', color: '#838485', element: IoPersonAddSharp },
+    { title: 'Total Students Not Interested', value: 0, link: '/hr-dashboard/students/not-interested', color: '#21bf40', element: FaCheck },
+    { title: 'Not Eligible', value: 0, link: '/hr-dashboard/students/not-eligible', color: '#3377f5', element: FaUserTie },
+    { title: 'Eligible/ Profile Sent', value: 0, link: '/hr-dashboard/students/eligible', color: '#49494a', element: FaTimes }
   ]);
 
   const [hrStatistics, setHrStatistics] = useState([
@@ -46,6 +48,7 @@ const HrPortal = () => {
   const navigate = useNavigate();
   const [errorMsg,setErrMsg]=useState(false)
   const [dropdownValue, setDropdownValue] = useState('selectCriteria');
+  const[stuDat,setSt]=useState({})
 
     const handleSelect = (e) => {
         setDropdownValue(e);
@@ -74,17 +77,17 @@ const HrPortal = () => {
   const fetchData = async () => {
     console.log("Applied")
     try {
-      const response = await axios.get(`http://localhost:5000/applicant-history/${candidate.mobileNo}`);
+      const response = await axios.get(`http://localhost:5000/hr-job-applicant-history/?candidateId=${candidate.candidateID}&hrId=${HrId}`);
       console.log("Applicant data",response.data) // Adjust the URL as needed
       setData(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
   };
-
+  console.log("Applications",data)
   useEffect(() => {
     const fetchStatistics = async () => {
-      try {
+      try {/*
         const [
           { data: applied },
           { data: qualified },
@@ -95,34 +98,46 @@ const HrPortal = () => {
           { data: recruiters },
           { data: notInterestedHrs }
         ] = await Promise.all([
-          axios.get('http://localhost:5000/statistics/applied'),
-          axios.get('http://localhost:5000/statistics/qualified'),
-          axios.get('http://localhost:5000/statistics/placed'),
-          axios.get('http://localhost:5000/statistics/not-placed'),
-          axios.get('http://localhost:5000/statistics/not-attended'),
-          axios.get('http://localhost:5000/statistics/not-interested'),
-          axios.get('http://localhost:5000/statistics/not-eligible'),
-          axios.get('http://localhost:5000/statistics/eligible')
-        ]);
-
+          axios.get(`http://localhost:5000/hr-statistics/?status=applied&hrId=${HrId}`),
+          axios.get('http://localhost:5000/hr-statistics/qualified'),
+          axios.get('http://localhost:5000/hr-statistics/placed'),
+          axios.get('http://localhost:5000/hr-statistics/not-placed'),
+          axios.get('http://localhost:5000/hr-statistics/not-attended'),
+          axios.get('http://localhost:5000/hr-statistics/not-interested'),
+          axios.get('http://localhost:5000/hr-statistics/not-eligible'),
+          axios.get('http://localhost:5000/hr-statistics/eligible')
+        ]);*/
+        console.log("Doing apis")
+        const appliedResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=applied&hrId=${HrId}`);
+const qualifiedResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=qualified&hrId=${HrId}`);
+const placedResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=placed&hrId=${HrId}`);
+const notPlacedResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=not-placed&hrId=${HrId}`);
+const notAttendedResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=not-attended&hrId=${HrId}`);
+const confirmedLeadsResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=not-interested&hrId=${HrId}`);
+const recruitersResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=not-eligible&hrId=${HrId}`);
+const notInterestedHrsResponse = await axios.get(`http://localhost:5000/hr-statistics/?status=eligible&hrId=${HrId}`);
+        console.log("Done apis")
+        console.log("Applied data",qualifiedResponse.data.count)
+        setSt(appliedResponse)
         setStatistics(prevStats => prevStats.map(stat => {
+          
           switch (stat.title) {
             case 'Total Students Applied':
-              return { ...stat, value: applied.count };
+              return { ...stat, value: appliedResponse.data.count };
             case 'Total Students Qualified':
-              return { ...stat, value: qualified.count };
+              return { ...stat, value: qualifiedResponse.data.count };
             case 'Total Students Placed':
-              return { ...stat, value: placed.count };
+              return { ...stat, value: placedResponse.data.count };
             case 'Total Students Not Placed':
-              return { ...stat, value: notPlaced.count };
+              return { ...stat, value: notPlacedResponse.data.count };
             case 'Total Students Not Attended':
-              return { ...stat, value: notAttended.count };
+              return { ...stat, value: notAttendedResponse.data.count };
             case 'Total Students Not Interested':
-              return { ...stat, value: confirmedLeads.count };
+              return { ...stat, value: confirmedLeadsResponse.data.count };
             case 'Not Eligible':
-              return { ...stat, value: recruiters.count };
+              return { ...stat, value: recruitersResponse.data.count };
             case 'Eligible/ Profile Sent':
-              return { ...stat, value: notInterestedHrs.count };
+              return { ...stat, value: notInterestedHrsResponse.data.count };
             default:
               return stat;
           }
@@ -133,37 +148,29 @@ const HrPortal = () => {
     };
     const jobStatistics = async () => {
       try {
-        const [
-          { data: HrLeads },
-          { data: JdReceived },
-          { data: profilesSent },
-          { data: driveScheduled },
-          { data: driveDone },
-          { data: notInterested },
-        ] = await Promise.all([
-          axios.get('http://localhost:5000/job-statistics/hr-leads'),
-          axios.get('http://localhost:5000/job-statistics/jd-received'),
-          axios.get('http://localhost:5000/job-statistics/profiles-sent'),
-          axios.get('http://localhost:5000/job-statistics/drive-scheduled'),
-          axios.get('http://localhost:5000/job-statistics/drive-done'),
-          axios.get('http://localhost:5000/job-statistics/not-interested'),
-        ]);
+        const HrLeadsResponse = await axios.get(`http://localhost:5000/hr-job-statistics/?status=hr-leads&hrId=${HrId}`);
+const JdReceivedResponse = await axios.get(`http://localhost:5000/hr-job-statistics/?status=jd-received&hrId=${HrId}`);
+const profilesSentResponse = await axios.get(`http://localhost:5000/hr-job-statistics/?status=profile-sent&hrId=${HrId}`);
+const driveScheduledResponse = await axios.get(`http://localhost:5000/hr-job-statistics/?status=drive-scheduled&hrId=${HrId}`);
+const driveDoneResponse = await axios.get(`http://localhost:5000/hr-job-statistics/?status=drive-done&hrId=${HrId}`);
+const notInterestedResponse = await axios.get(`http://localhost:5000/hr-job-statistics/?status=not-interested&hrId=${HrId}`);
+
     
         setHrStatistics(prevStats =>
           prevStats.map(stat => {
             switch (stat.title) {
               case 'Hr Leads':
-                return { ...stat, value: HrLeads.count };
+                return { ...stat, value: HrLeadsResponse.data.count };
               case 'JD received':
-                return { ...stat, value: JdReceived.count };
+                return { ...stat, value: JdReceivedResponse.data.count };
               case 'Profiles Sent':
-                return { ...stat, value: profilesSent.count };
+                return { ...stat, value: profilesSentResponse.data.count };
               case 'Drive Scheduled':
-                return { ...stat, value: driveScheduled.count };
+                return { ...stat, value: driveScheduledResponse.data.count };
               case 'Drive Done/Offer received':
-                return { ...stat, value: driveDone.count };
+                return { ...stat, value: driveDoneResponse.data.count };
               case 'Not interested HRs':
-                return { ...stat, value: notInterested.count };
+                return { ...stat, value: notInterestedResponse.data.count };
               default:
                 return stat;
             }
@@ -183,12 +190,19 @@ const HrPortal = () => {
     sessionStorage.setItem("activeTab",id)
     setActiveTab(id)
   }
+  
   const memoColumns = useMemo(() => [
     
     { Header: 'Full Name', accessor: 'fullName' },
     { Header: 'Contact Number', accessor: 'mobileNo' },
     { Header: 'Email', accessor: 'email' },
-    { Header: 'Job Role', accessor: 'jobRole' },
+    { Header: 'Job Role', accessor: 'jobRole',
+      Cell: ({ row }) => (
+        <Link style={{textDecoration:'none',color:'#53289e',fontWeight:'500'}} to={`/hr-dashboard/job/${row.original.JobId}`}>
+          {row.original.jobRole}
+        </Link>
+      )
+     },
     { Header: 'Company Name', accessor: 'companyName' },
     {
       Header: 'Status',
@@ -241,6 +255,7 @@ const HrPortal = () => {
     usePagination
   );
   const handleMoreInfo = (link) => {
+    console.log("event clicked")
     navigate(link);
   };
 
@@ -254,7 +269,7 @@ const HrPortal = () => {
         return renderApplicantHistory()    
     }
   }
-
+  
   const handleResumeDownload = async (applicationId) => {
     try {
       console.log("Id:", applicationId);
@@ -299,7 +314,7 @@ const HrPortal = () => {
        
     }
   }
-
+  console.log("Students",statistics)
   const renderApplicantHistory=()=>{
 
     return(
@@ -488,7 +503,7 @@ const HrPortal = () => {
         </Row>
     )
   }
-console.log(hrStatistics)
+
   return (
     <div style={{ backgroundColor: '#e9ebf0', zIndex: 2, height: '100vh' }}>
       <HrNavbar />

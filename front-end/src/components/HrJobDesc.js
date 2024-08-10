@@ -8,6 +8,11 @@ import * as XLSX from 'xlsx';
 import axios from 'axios'
 import ramana from '../images/p3.jpeg';
 import logo from '../images/avatar2.avif'
+import HrNavbar from './HrNavbar/HrNavbar';
+import {toast} from 'react-toastify';
+import EditJobModal from './EditJobModal/EditJobModal';
+import { RxDotFilled } from 'react-icons/rx';
+const statusInfo={'jd-received':'JD Received','profiles-sent':'Profiles sent','drive-scheduled':'Drive Scheduled','drive-done':'Drive Done','not-interested':"Not Interested"} 
 
 const HrJobDesc = () => {
   const { jobId} = useParams();
@@ -15,6 +20,9 @@ const HrJobDesc = () => {
   const[job,setJob]=useState({})
   const [selectedIds, setSelectedIds] = useState([]);
   const[data,setData]=useState([])
+  const [selectedJob, setSelectedJob] = useState(null);
+ 
+  const [showModal, setShowModal] = useState(false);
   
   useEffect(() => {
     
@@ -40,7 +48,7 @@ const HrJobDesc = () => {
   const fetchJobData = async () => {
     try {
         console.log("In method",jobId)
-      const response = await axios.get(`http://localhost:5000/view-jobs/${jobId}`);
+      const response = await axios.get(`http://localhost:5000/view-jobs/job/${jobId}`);
       console.log(response.data)
       setJob(response.data);
     } catch (error) {
@@ -186,6 +194,32 @@ const HrJobDesc = () => {
     }
   };
 
+  const handleEdit = (job) => {
+    setSelectedJob(job);
+    setShowModal(true);
+  };
+
+  const handleSave = async (updatedJob) => {
+    const changedValues = {};
+    //const originalJob = filteredJobs.find(job => updatedJob.jobId === job.jobId);
+    for (let key in updatedJob) {
+      if (updatedJob.hasOwnProperty(key) && job.hasOwnProperty(key)) {
+        if (updatedJob[key] !== job[key]) {
+          changedValues[key] = updatedJob[key];
+        }
+      }
+    }
+    try {
+      await axios.post("http://localhost:5000/update-job", { changedValues, jobId: updatedJob.jobId });
+      toast.success(`Job updated successfully`, { autoClose: 5000 });
+      setShowModal(false);
+      fetchJobData();
+    } catch (error) {
+      console.error('There was an error updating the job!', error);
+      toast.error(`${error.response.data.error}`, { autoClose: 5000 });
+    }
+  };
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -230,6 +264,7 @@ const HrJobDesc = () => {
   
   return (
     <>
+    <HrNavbar/>
     <div>
     <img src={ramana} alt='logo' className='rounded mt-3 ms-3' style={{width:'200px'}}/>
     <div style={{float:'right'}} className='p-3 rounded me-3'>
@@ -237,8 +272,12 @@ const HrJobDesc = () => {
     </div>
     </div>
     <h3 className='text-center fw-bold text-decoration-underline'>Job description </h3>
-    <Container className='border p-3 rounded shadow mt-5'>
-      <h1 className='fw-bold'>{job.companyName}</h1>
+    <Container className='border p-3 rounded  mt-5'>
+        <div className='d-flex justify-content-between'> 
+        <h1 className='fw-bold'>{job.companyName}</h1>           
+            <span style={{border:'1px solid #fdf3c6',borderRadius:'5px',padding:'5px',fontSize:'10px',backgroundColor:'#fdf3c6',color:'#943d0e',fontWeight:'800',height:'30px'}}><RxDotFilled/>{statusInfo[job.status]}</span>
+            </div>
+      
       <p><strong>Job ID:</strong> {job.jobId}</p>
       <p><strong>Job Title:</strong>{job.jobTitle} </p>
       <p><strong>Job Category:</strong> {job.jobCategory}</p>
@@ -252,7 +291,13 @@ const HrJobDesc = () => {
       <h5 className='fw-bold text-danger mb-3'>Posted by:{job.postedBy}</h5>
       <div className='d-flex justify-content-around w-25'>
       <Button variant="secondary" className='px-5'><Link to='/dashboard' className='text-decoration-none text-dark fw-bold text-white text-nowrap'><i class="fa-solid fa-left-long"></i> Back</Link></Button>
-      <Button variant="primary" className='fw-bold ms-2 px-5'><Link to='/apply-job' className='text-decoration-none text-dark fw-bold text-nowrap text-white'>Apply Now</Link></Button>
+      <Button variant="primary" className='fw-bold ms-2 px-5' onClick={() => handleEdit(job)}>Edit</Button>
+      <EditJobModal
+                        show={showModal}
+                        handleClose={() => setShowModal(false)}
+                        job={selectedJob}
+                        handleSave={handleSave}
+                      />
       </div>
     </Container>
     {data.length>0?(<Container fluid className='py-5' style={{ fontFamily: 'Calibri',width:'90vw' }}>

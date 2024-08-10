@@ -1,7 +1,7 @@
 // StudentDetails.js
 import React, { useEffect, useState } from 'react';
 import { Container, Col, Table, Alert } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
+import { useParams ,Link} from 'react-router-dom';
 import axios from 'axios';
 import { FaFilePdf } from 'react-icons/fa';
 
@@ -15,11 +15,16 @@ const StudentDetails = () => {
     fetchStudentData();
     fetchAppliedJobs();
   }, [candidateID]);
-
+  const HrId='RSHR-02'
   const fetchStudentData = async () => {
     try {
+      
+      
       const response = await axios.get(`http://localhost:5000/applicant-history/?candidateID=${candidateID}`);
       setStudentData(response.data);
+      console.log("Stud",response.data)
+      
+      
     } catch (error) {
       console.error('Error fetching student data', error);
       setErrorMsg('No data found for the student.');
@@ -28,8 +33,13 @@ const StudentDetails = () => {
 
   const fetchAppliedJobs = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/applicant-history/${candidateID}`);
+      const response = await axios.get(`http://localhost:5000/hr-job-applicant-history/?candidateId=${candidateID}&hrId=${HrId}`);
       setAppliedJobs(response.data);
+      if(response.data.length>0){
+        setErrorMsg('')
+      }else{
+        setErrorMsg('No job applications found for the student.');
+      }
     } catch (error) {
       console.error('Error fetching applied jobs', error);
       setErrorMsg('No applied jobs found for the student.');
@@ -40,7 +50,7 @@ const StudentDetails = () => {
     // Handle resume download logic here
     console.log('Download resume for application ID:', applicationId);
   };
-  console.log(appliedJobs)
+  console.log(errorMsg,appliedJobs)
   return (
     <Container className='mt-4'>
       <h2>Student data</h2>
@@ -91,7 +101,7 @@ const StudentDetails = () => {
               {appliedJobs.map(job => (
                 <tr key={job.jobID}>
                   <td>{job.jobID}</td>
-                  <td>{job.jobRole}</td>
+                  <td><Link to={`/hr-dashboard/job/${job.jobID}`}>{job.jobRole}</Link></td>
                   <td>{job.companyName}</td>
                   <td>{job.applicationDate}</td>
                   <td>{job.status}</td>

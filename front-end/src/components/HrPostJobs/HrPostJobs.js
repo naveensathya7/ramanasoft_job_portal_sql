@@ -23,7 +23,7 @@ const validationSchema = Yup.object().shape({
   salary: Yup.string().required('Salary is required'),
   applicationUrl: Yup.string().url('Invalid URL').required('Application URL is required')
 });
-
+const HrId='RSHR-02'
 const HrPostJobs = () => {
   const [companyNames, setCompanyNames] = useState([]);
   const [companyDetails, setCompanyDetails] = useState({});
@@ -49,12 +49,12 @@ const HrPostJobs = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     console.log(values);
     try {
-      const response = await axios.post('http://localhost:5000/post-job', { job: values });
+      const response = await axios.post('http://localhost:5000/post-job', { job: values,hrId:HrId });
       console.log('Registration request sent', response);
       toast.success('Job posted successfully', {
         autoClose: 5000
       });
-      resetForm();
+      //resetForm();
     } catch (error) {
       console.error('There was an error registering!', error);
       toast.error(`${error.response?.data?.message || 'Error posting job'}`, {

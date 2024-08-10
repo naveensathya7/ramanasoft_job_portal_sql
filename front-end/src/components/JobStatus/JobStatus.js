@@ -7,7 +7,7 @@ import * as XLSX from 'xlsx';
 import axios from 'axios';
 import HrStatusCell from '../HrStatusCell'; // Import the StatusCell component
 import { Container, Row, Col, Button, Form, Table } from 'react-bootstrap';
-
+const HrId="RSHR-02"
 const JobStatus = () => {
   const [data, setData] = useState([]); // State to store table data
   const [selectedIds, setSelectedIds] = useState([]); // State to store selected application IDs
@@ -24,8 +24,9 @@ const JobStatus = () => {
   useEffect(() => {
     // Fetch data from the backend API based on the status parameter
     const fetchData = async () => {
+      console.log("Status is api call",status)
       try {
-        const response = await axios.get(`http://localhost:5000/view-jobs/${status}`); // Adjust the URL as needed
+        const response = await axios.get(`http://localhost:5000/hr-view-jobs-status/?status=${status}&hrId=${HrId}`); // Adjust the URL as needed
         setData(response.data.map(item => ({ ...item, isEditing: false })));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -34,7 +35,19 @@ const JobStatus = () => {
 
     fetchData();
   }, [status]);
-
+  //console.log(status)
+  const formatDate = (date) => {
+    /*
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    console.log(new Date(date).toLocaleDateString(undefined, options))
+    return new Date(date).toLocaleDateString(undefined, options);*/
+    const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+    }
+    
   const updateStatus = async (jobId, status) => {
     try {
       // Update the status in the backend
@@ -103,8 +116,18 @@ const JobStatus = () => {
         return <span style={{ color, fontWeight: '600' }}>{value}</span>;
       }
     },
-    { Header: 'Posted Date', accessor: 'postedOn' },
-    { Header: 'Last Date', accessor: 'lastDate' },
+    { Header: 'Posted Date', accessor: 'postedOn',
+      Cell:({value})=>{
+        value=formatDate(value)
+        return <span>{value}</span>;
+      }
+     },
+    { Header: 'Last Date', accessor: 'lastDate',
+      Cell:({value})=>{
+        value=formatDate(value)
+        return <span>{value}</span>;
+      }
+    },
     { Header: 'Location', accessor: 'Location' },
   ], [selectedIds, data]);
 
@@ -168,7 +191,7 @@ const JobStatus = () => {
     }
     return pageNumbers;
   };
-
+  console.log(data)
   return (
     <>
       <HrNavbar />

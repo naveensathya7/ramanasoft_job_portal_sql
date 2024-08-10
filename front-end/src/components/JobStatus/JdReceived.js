@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, useSortBy, useGlobalFilter, usePagination } from 'react-table';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import { FaFilePdf } from "react-icons/fa";
 import HrNavbar from '../HrNavbar/HrNavbar';
 import * as XLSX from 'xlsx';
@@ -12,12 +12,12 @@ const HrLeads = () => {
   const [data, setData] = useState([]); // State to store table data
   const [selectedIds, setSelectedIds] = useState([]); // State to store selected application IDs
   const navigate = useNavigate();
-
+  const HrId='RSHR-02'
   useEffect(() => {
     // Fetch data from the backend API
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/view-jobs'); // Adjust the URL as needed
+        const response = await axios.get(`http://localhost:5000/hr-view-jobs?hrId=${HrId}`); // Adjust the URL as needed
         setData(response.data.map(item => ({ ...item, isEditing: false })));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -26,6 +26,18 @@ const HrLeads = () => {
 
     fetchData();
   }, []);
+
+  const formatDate = (date) => {
+    /*
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    console.log(new Date(date).toLocaleDateString(undefined, options))
+    return new Date(date).toLocaleDateString(undefined, options);*/
+    const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+    }
 
   const updateStatus = async (jobId, status) => {
     try {
@@ -87,8 +99,20 @@ const HrLeads = () => {
       disableSortBy: true,
       disableGlobalFilter: true,
     },
-    { Header: 'Company Name', accessor: 'companyName' },
-    { Header: 'Job Title', accessor: 'jobTitle' },
+    { Header: 'Company Name', accessor: 'companyName',
+      Cell: ({ row }) => (
+        <Link style={{textDecoration:'none',color:'#53289e',fontWeight:'500'}} to={`/companies/${row.original.companyID}`}>
+          {row.original.companyName}
+        </Link>
+      )
+    },
+    { Header: 'Job Title', accessor: 'jobTitle',
+      Cell: ({ row }) => (
+        <Link style={{textDecoration:'none',color:'#53289e',fontWeight:'500'}} to={`/hr-dashboard/job/${row.original.jobId}`}>
+          {row.original.jobTitle}
+        </Link>
+      )
+     },
     { Header: 'Hr Email', accessor: 'email' },
     { Header: 'Job Experience', accessor: 'jobExperience' },
     { Header: 'Job Type', accessor: 'jobType' },
@@ -104,10 +128,20 @@ const HrLeads = () => {
         />
       )
     },
-    { Header: 'Posted Date', accessor: 'postedOn' },
-    { Header: 'Last Date', accessor: 'lastDate' },
+    { Header: 'Posted Date', accessor: 'postedOn',
+      Cell:({value})=>{
+        value=formatDate(value)
+        return <span>{value}</span>;
+      }
+     },
+    { Header: 'Last Date', accessor: 'lastDate',
+      Cell:({value})=>{
+        value=formatDate(value)
+        return <span>{value}</span>;
+      }
+     },
     { Header: 'Location', accessor: 'Location' },
-    { Header: 'Resume', accessor: 'resume', disableSortBy: true }
+    
   ], [selectedIds, data]);
 
   const memoData = useMemo(() => data, [data]);

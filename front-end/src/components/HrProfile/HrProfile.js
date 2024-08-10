@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios'
 import './HrProfile.css';
 import HrNavbar from '../HrNavbar/HrNavbar';
 
 const ProfilePage = () => {
   const [showModal, setShowModal] = useState(false);
   const [profile, setProfile] = useState({
-    name: 'Naveen',
-    email: 'naveensathya.vanamoju@gmail.com',
-    phone: '9515982621',
-    jobTitle: 'HR Manager',
-    department: 'Human Resources',
-    location: 'Hyderabad, ',
-    bio: 'Experienced HR manager with over 10 years in the industry working in Ramanasoft.',
+    
   });
 
+  const hr=sessionStorage.getItem('user')
+  useEffect(()=>{
+      const fetchHRData=async()=>{
+        const response=await axios.get(`http://localhost:5000/hr-profile/${hr}`)
+        console.log("Response",response)
+        setProfile(response.data)
+      }
+      fetchHRData()
+      
+  },[])
   const handleEdit = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
 
@@ -28,7 +33,7 @@ const ProfilePage = () => {
     const { name, value } = e.target;
     setProfile({ ...profile, [name]: value });
   };
-
+  console.log(profile)
   return (
     <>
     <HrNavbar/>
@@ -44,7 +49,7 @@ const ProfilePage = () => {
                 width="150"
                 height="150"
               />
-              <h2>{profile.name}</h2>
+              <h2>{profile.fullName}</h2>
               <p>{profile.jobTitle}</p>
             </Card.Header>
             <Card.Body>
@@ -54,7 +59,7 @@ const ProfilePage = () => {
               </Row>
               <Row className="mb-3">
                 <Col sm={4}><strong>Phone:</strong></Col>
-                <Col sm={8}>{profile.phone}</Col>
+                <Col sm={8}>{profile.mobileNo}</Col>
               </Row>
               <Row className="mb-3">
                 <Col sm={4}><strong>Department:</strong></Col>

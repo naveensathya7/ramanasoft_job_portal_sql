@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { Container, Row, Col } from 'react-bootstrap';
 import 'react-toastify/dist/ReactToastify.css';
 import HrNavbar from '../HrNavbar/HrNavbar';
-
+const HrId='RSHR-02'
 const AddHr = () => {
   const [formData, setFormData] = useState({
     hrName: '',
@@ -13,7 +13,8 @@ const AddHr = () => {
     email: '',
     phoneNumber: '',
     address: '',
-    publishedHr: ''
+    publishedHr: '',
+    hrId:HrId
   });
 
   const [errors, setErrors] = useState({});
@@ -116,6 +117,7 @@ const AddHr = () => {
                 value={formData.hrName}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                
               />
               {errors.hrName && <p style={{ color: 'red' }}>{errors.hrName}</p>}
             </Col>
@@ -166,6 +168,7 @@ const AddHr = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 onBlur={handleBlur}
+                maxLength={10}
               />
               {errors.phoneNumber && (
                 <p style={{ color: 'red' }}>{errors.phoneNumber}</p>

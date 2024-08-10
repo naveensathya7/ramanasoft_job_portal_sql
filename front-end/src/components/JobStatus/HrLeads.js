@@ -73,7 +73,7 @@ const HrLeads = () => {
     },
     { Header: 'Company Name', accessor: 'companyName',
       Cell: ({ row }) => (
-        <Link to={`/companies/${row.original.companyID}`}>
+        <Link style={{textDecoration:'none',color:'#53289e',fontWeight:'500'}} to={`/companies/${row.original.companyID}`}>
           {row.original.companyName}
         </Link>
       )

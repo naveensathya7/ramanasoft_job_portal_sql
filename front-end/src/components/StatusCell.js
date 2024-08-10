@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaEdit } from 'react-icons/fa';
-
+const statusInfo={'applied':'Applied','qualified':'Qualified','placed':'Placed','not-placed':'Not Placed','not-attended':'Not Attended','not-interested':'Not Interested','not-eligible':'Not Eligible','eligible':'Eligible/Profile Sent','under-progress':'Yet to receive feedback','level-1':'Level 1','level-2':'Level 2','level-3':'Level 3'}
 const StatusCell = ({ value, row, updateStatus, isEditing }) => {
   const getStatusColor = (status) => {
     switch (status) {
@@ -22,22 +22,22 @@ const StatusCell = ({ value, row, updateStatus, isEditing }) => {
           value={value}
           onChange={(e) => updateStatus(row.original.applicationID, e.target.value)}
         >
-          <option value="Applied">Applied</option>
-          <option value="Qualified">Qualified</option>
-          <option value="Not Qualified">Not Qualified</option>
-          <option value="Placed">Placed</option>
+          <option value="applied">Applied</option>
+          <option value="qualified">Qualified</option>
+          <option value="not-qualified">Not Qualified</option>
+          <option value="placed">Placed</option>
           
               
               
-              <option value="Not Placed">Not Placed</option>
-              <option value="Not Attended">Not Attended</option>
-              <option value="Not Interested">Not Interested</option>
-              <option value="Not Eligible">Not Eligible</option>
-              <option value="Eligible">Eligible/Profile Sent</option>
-              <option value="Under Progress">Yet to Receive Feedback</option>
-              <option value="Level 1">Level 1</option>
-              <option value="Level 2">Level 2</option>
-              <option value="Level 3">Level 3</option>
+              <option value="not-placed">Not Placed</option>
+              <option value="not-attended">Not Attended</option>
+              <option value="not-interested">Not Interested</option>
+              <option value="not-eligible">Not Eligible</option>
+              <option value="eligible">Eligible/Profile Sent</option>
+              <option value="under-progress">Yet to Receive Feedback</option>
+              <option value="level-1">Level 1</option>
+              <option value="level-2">Level 2</option>
+              <option value="level-3">Level 3</option>
         </select>
       ) : (
         <>
@@ -51,7 +51,7 @@ const StatusCell = ({ value, row, updateStatus, isEditing }) => {
               marginRight: '8px'
             }}
           ></span>
-          {value}
+          {statusInfo[value]}
         </>
       )}
       <button

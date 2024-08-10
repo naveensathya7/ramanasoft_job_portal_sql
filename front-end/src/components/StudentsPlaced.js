@@ -2,20 +2,23 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useTable, useSortBy, useGlobalFilter, usePagination } from 'react-table';
 import { FaFilePdf } from "react-icons/fa";
 import HrNavbar from './HrNavbar/HrNavbar';
+import { useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
 import StatusCell from './StatusCell'; // Import the StatusCell component
 import { Container, Row, Col, Button, Form, Table } from 'react-bootstrap'; // Import necessary components from react-bootstrap
-
+const statusInfo={'applied':'Applied','qualified':'Qualified','placed':'Placed','not-placed':'Not Placed','not-attended':'Not Attended','not-interested':'Not Interested','not-eligible':'Not Eligible','eligible':'Eligible/Profile Sent','under-progress':'Yet to receive feedback','level-1':'Level 1','level-2':'Level 2','level-3':'Level 3'}
+const HrId='RSHR-02'
 const StudentsPlaced = () => {
   const [data, setData] = useState([]); // State to store table data
   const [selectedIds, setSelectedIds] = useState([]); // State to store selected application IDs
+  const{status}=useParams()
 
   useEffect(() => {
     // Fetch data from the backend API
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/applications/Placed'); // Adjust the URL as needed
+        const response = await axios.get(`http://localhost:5000/hr-job-applicants/?status=${status}&hrId=${HrId}`); // Adjust the URL as needed
         setData(response.data.map(item => ({ ...item, isEditing: false })));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -65,6 +68,7 @@ const StudentsPlaced = () => {
       accessor: 'status',
       Cell: ({ value }) => {
         let color;
+        value=statusInfo[value]
         switch (value) {
           case 'In progress':
             color = 'yellow';
@@ -181,7 +185,7 @@ const StudentsPlaced = () => {
       <Container fluid className='py-5' style={{ fontFamily: 'Calibri',width:'90vw' }}>
         <Row className='mb-3'>
           <Col>
-            <h1>Students Applied</h1>
+            <h1>Students {statusInfo[status]}</h1>
           </Col>
         </Row>
         <Row className='mb-3'>

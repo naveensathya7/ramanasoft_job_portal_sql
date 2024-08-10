@@ -12,15 +12,13 @@ const validationSchema = Yup.object().shape({
   jobDescription: Yup.string().required('Job Description is required'),
   jobExperience: Yup.string().required('Job Experience is required'),
   jobQualification: Yup.string().required('Job Qualification is required'),
-  jobRole: Yup.string().required('Job Role is required'),
-  jobTags: Yup.string(),
+  
   jobType: Yup.string().required('Job Type is required'),
   salary: Yup.string().required('Salary is required'),
   phone: Yup.string().required('Phone is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   location: Yup.string().required('Location is required'),
-  requirements: Yup.string().required('Job Requirements are required'),
-  responsibilities: Yup.string().required('Job Responsibilities are required'),
+  
   applicationUrl: Yup.string().url('Invalid URL').required('Application URL is required'),
   postedOn: Yup.date().required('Posted On date is required'),
   lastDate: Yup.date().required('Last Date is required'),
@@ -35,15 +33,13 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
     jobDescription: '',
     jobExperience: '',
     jobQualification: '',
-    jobRole: '',
-    jobTags: '',
+    
     jobType: '',
     salary: '',
     phone: '',
     email: '',
     location: '',
-    requirements: '',
-    responsibilities: '',
+    
     applicationUrl: '',
     postedOn: '',
     lastDate: '',
@@ -60,15 +56,13 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
         jobDescription: job.jobDescription || '',
         jobExperience: job.jobExperience || '',
         jobQualification: job.jobQualification || '',
-        jobRole: job.jobRole || '',
-        jobTags: job.jobTags || '',
+        
         jobType: job.jobType || '',
         salary: job.salary || '',
         phone: job.phone || '',
         email: job.email || '',
         location: job.Location || '',
-        requirements: job.requirements || '',
-        responsibilities: job.responsibilities || '',
+        
         applicationUrl: job.applicationUrl || '',
         postedOn: job.postedOn || '',
         lastDate: job.lastDate || '',
@@ -87,14 +81,25 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
     handleSave(updatedValues);
   };
 
+  const handleModalClose = (e) => {
+    
+    handleClose();
+  };
+
   return (
     <Modal
       show={show}
-      onHide={handleClose}
+      onHide={(e) => {
+        
+        handleClose(e);
+      }}
       dialogClassName="modal-80w" // Custom class for width
       aria-labelledby="edit-job-modal"
     >
-      <Modal.Header closeButton>
+      <Modal.Header 
+        closeButton 
+        onClick={handleModalClose}
+      >
         <Modal.Title id="edit-job-modal">
           <MdEdit className="me-1" /> Edit Job
         </Modal.Title>
@@ -193,31 +198,7 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group controlId="formJobRole">
-                    <Form.Label>Job Role</Form.Label>
-                    <Field
-                      type="text"
-                      name="jobRole"
-                      as={Form.Control}
-                      isInvalid={!!ErrorMessage['jobRole']}
-                    />
-                    <ErrorMessage name="jobRole" component="div" className="invalid-feedback" />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group controlId="formJobTags">
-                    <Form.Label>Job Tags</Form.Label>
-                    <Field
-                      type="text"
-                      name="jobTags"
-                      as={Form.Control}
-                    />
-                    <ErrorMessage name="jobTags" component="div" className="invalid-feedback" />
-                  </Form.Group>
-                </Col>
-              </Row>
+              
               <Row className="mb-3">
                 <Col md={6}>
                   <Form.Group controlId="formJobType">
@@ -288,30 +269,6 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
                   </Form.Group>
                 </Col>
                 <Col md={6}>
-                  <Form.Group controlId="formRequirements">
-                    <Form.Label>Job Requirements</Form.Label>
-                    <Field
-                      as="textarea"
-                      name="requirements"
-                      className="form-control"
-                    />
-                    <ErrorMessage name="requirements" component="div" className="invalid-feedback" />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col md={6}>
-                  <Form.Group controlId="formResponsibilities">
-                    <Form.Label>Job Responsibilities</Form.Label>
-                    <Field
-                      as="textarea"
-                      name="responsibilities"
-                      className="form-control"
-                    />
-                    <ErrorMessage name="responsibilities" component="div" className="invalid-feedback" />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
                   <Form.Group controlId="formApplicationUrl">
                     <Form.Label>Application URL</Form.Label>
                     <Field
@@ -324,6 +281,7 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
                   </Form.Group>
                 </Col>
               </Row>
+              
               <Row className="mb-3">
                 <Col md={6}>
                   <Form.Group controlId="formPostedOn">
@@ -353,7 +311,8 @@ const EditJobModal = ({ show, handleClose, job, handleSave }) => {
               <Button variant="primary" type="submit" disabled={isSubmitting}>
                 Save Changes
               </Button>
-              <Button variant="secondary" onClick={handleClose} className="ms-2">
+              <Button variant="secondary" onClick={handleModalClose}
+               className="ms-2">
                 Cancel
               </Button>
             </FormikForm>

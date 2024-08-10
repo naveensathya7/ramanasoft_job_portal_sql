@@ -3,14 +3,20 @@ import { Navbar, Nav, Container, Form, Button, Row, Col } from 'react-bootstrap'
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { FaCheck, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaChevronRight, FaTimes } from 'react-icons/fa';
+
 import { MdEdit, MdDelete } from 'react-icons/md';
 import HrNavbar from '../HrNavbar/HrNavbar';
 import EditJobModal from '../EditJobModal/EditJobModal';
+import { RxDotFilled } from "react-icons/rx";
 import { useNavigate,Link} from 'react-router-dom';
 import './HrViewJobs.css';
+import { FaMapMarkerAlt, FaMoneyBillWave, FaUserFriends, FaCalendarAlt,FaAngleRight } from 'react-icons/fa';
 
+import { FcExpired } from 'react-icons/fc';
 
+const statusInfo={'jd-received':'JD Received','profiles-sent':'Profiles sent','drive-scheduled':'Drive Scheduled','drive-done':'Drive Done','not-interested':"Not Interested"} 
+const HrId="RSHR-02"
 const HrViewJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,9 +44,17 @@ const HrViewJobs = () => {
     }
   }, [jobs, searchTerm]);
 
+ 
+
+  const formatDate = (date) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return new Date(date).toLocaleDateString(undefined, options);
+  }
+
+
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/view-jobs");
+      const response = await axios.get(`http://localhost:5000/hr-view-jobs?hrId=${HrId}`);
       setJobs(response.data);
     } catch (error) {
       console.error('Error fetching jobs:', error);
@@ -103,7 +117,7 @@ const HrViewJobs = () => {
     setSortCriteria(criteria);
     setJobs(sortedJobs);
   };
-
+/*
   const formatDate = (isoString) => {
     const date = new Date(isoString);
     const year = date.getFullYear();
@@ -111,26 +125,19 @@ const HrViewJobs = () => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+*/
+console.log(jobs)
 
-  
-
+const lastDate = new Date("2024-08-27T18:30:00.000Z");
+console.log(lastDate)
+const currentDate = new Date();
   return (
     <div style={{ overflowY: 'scroll',height:'150vh',paddingBottom:'10px' }}>
       <HrNavbar />
       <Container className="my-4">
         <div className="d-flex flex-row justify-content-between">
           <h1 style={{ color: '#888888', fontWeight: 'bold', fontSize: '25px' }}>Available Jobs</h1>
-          <select
-            id="sort"
-            name="sort"
-            value={sortCriteria}
-            onChange={(e) => handleSort(e.target.value)}
-          >
-            <option value="">Select</option>
-            <option value="name">Job Title</option>
-            <option value="date">Date Posted</option>
-            <option value="company">Company Name</option>
-          </select>
+          
         </div>
         <Form.Control
           type="text"
@@ -144,34 +151,65 @@ const HrViewJobs = () => {
         {filteredJobs.length > 0 ? (
           <Row xs={1} sm={1} md={2} lg={3} className="g-4">
             {filteredJobs.map(job => (
-              <Link className="job-card" key={job.jobId} to={`/hr-dashboard/job/${job.jobId}`}>
-              <Col>
-                <div className="card h-100" style={{ boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)' }}>
-                  <div className="card-body">
-                    <h5 className="card-title fw-bold">{job.jobRole}</h5>
-                    <p className="card-text"><span className='span-text'>Company Name:</span> {job.companyName}</p>
-                    <p className="card-text"><span className='span-text'>Required Skills:</span> {job.requiredSkills}</p>
-                    <p className="card-text"><span className='span-text'>Location:</span> {job.jobCity}</p>
-                    <p className="card-text"><span className='span-text'>Salary:</span> {job.salary}</p>
-                    <p className="card-text"><span className='span-text'>Posted Date:</span> {formatDate(job.postedOn)}</p>
-                    <p className="card-text"><span className='span-text'>Last Date:</span> {formatDate(job.lastDate)}</p>
-                    <div className="btn-container">
-                      <Button className="edit-btn" onClick={() => handleEdit(job)}>
-                        <MdEdit className="me-1" /> Edit
-                      </Button>
-                      <EditJobModal
-                        show={showModal}
-                        handleClose={() => setShowModal(false)}
-                        job={selectedJob}
-                        handleSave={handleSave}
-                      />
-                      <Button className="delete-btn" onClick={() => handleDelete(job)}>
-                        <MdDelete className="me-1" /> Delete
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Col></Link>
+              
+              <Col key={job.jobId}>
+      <div
+        className="card h-100"
+        style={{
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.19)',
+          borderRadius: '10px',
+          padding: '5px',
+        }}
+        onClick={() => window.location.href = `/hr-dashboard/job/${job.jobId}`}
+
+      >
+        <div className="card-body">
+          <div className="d-flex justify-content-between ">
+            <div>
+              <h5 className="card-title fw-bold">{job.jobTitle}</h5>
+              <p className="card-subtitle mb-2 text-muted">{job.companyName}</p>
+            </div>
+            {new Date(job.lastDate) < currentDate && <span style={{ fontWeight: '500', color: '#fa3e4b' }}><FcExpired />Applications closed</span>}
+            
+          </div>
+
+          <div className="mt-3">
+            
+              <p><FaMapMarkerAlt className="me-2" />Location: <span> {job.Location}</span></p>
+              
+            
+            <div className="d-flex mb-2">
+              <FaMoneyBillWave className="me-2" /> <span>CTC: {job.salary}</span>
+            </div>
+            <div className="d-flex mb-2">
+              <FaUserFriends className="me-2" /> <span>Openings: {job.openings}</span>
+            </div>
+            <div className="d-flex mb-2">
+              <FaCalendarAlt className="me-2" /> <span>Apply By: {formatDate(job.lastDate)}</span>
+            </div>
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <span
+              style={{
+                border: '1px solid #fdf3c6',
+                borderRadius: '5px',
+                padding: '5px',
+                fontSize: '12px',
+                backgroundColor: '#fdf3c6',
+                color: '#943d0e',
+                fontWeight: '500',
+              }}
+            >
+              <RxDotFilled /> {statusInfo[job.status]}
+            </span>
+            <a style={{textDecoration:'none',color:'#53289e',fontWeight:'500'}} href={`/hr-dashboard/job/${job.jobId}`} className="btn btn-link p-0">
+              View Details<FaChevronRight className='ms-1'size={15}/>
+            </a>
+          </div>
+        </div>
+      </div>
+    </Col>
               
             ))}
           </Row>

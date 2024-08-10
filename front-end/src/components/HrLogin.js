@@ -17,7 +17,7 @@ const HrLogin = () => {
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(0);
   const firstOtpInputRef = useRef(null)
-  const [user,setUser]=useState({})
+  const [user,setUser]=useState('')
   useEffect(() => {
     let countdown;
     if (timer > 0) {
@@ -93,7 +93,7 @@ const HrLogin = () => {
       await axios.post("http://localhost:5000/login-hr",{mobileNo:formData.mobileNo})
       .then(async response=>{
         console.log(response)
-        setUser(response.data.record.fullName)
+        setUser(response.data.record.hrID)
         const generatedOtp = Math.floor(10000 + Math.random() * 90000).toString();
         setOtp(generatedOtp);
       try {
