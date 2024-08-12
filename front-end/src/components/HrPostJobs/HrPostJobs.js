@@ -27,6 +27,7 @@ const HrId='RSHR-02'
 const HrPostJobs = () => {
   const [companyNames, setCompanyNames] = useState([]);
   const [companyDetails, setCompanyDetails] = useState({});
+  const [companyId,setCompanyId]=useState(null)
   
   useEffect(() => {
     fetchCompanyNames();
@@ -37,7 +38,7 @@ const HrPostJobs = () => {
       const response = await axios.get('http://localhost:5000/registered-companies');
       setCompanyNames(response.data);
       const details = response.data.reduce((acc, company) => {
-        acc[company.companyName] = { email: company.email, phone: company.mobileNo };
+        acc[company.companyName] = { email: company.email, phone: company.mobileNo ,companyId:company.companyID};
         return acc;
       }, {});
       setCompanyDetails(details);
@@ -49,7 +50,7 @@ const HrPostJobs = () => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     console.log(values);
     try {
-      const response = await axios.post('http://localhost:5000/post-job', { job: values,hrId:HrId });
+      const response = await axios.post('http://localhost:5000/post-job', { job: values,hrId:HrId,companyId:companyId });
       console.log('Registration request sent', response);
       toast.success('Job posted successfully', {
         autoClose: 5000
@@ -62,7 +63,7 @@ const HrPostJobs = () => {
       });
     }
   };
-  console.log(companyDetails)
+  console.log("Companies",companyDetails)
   return (
     <>
       <HrNavbar />
@@ -113,6 +114,7 @@ const HrPostJobs = () => {
                         if (selectedCompany !== 'Select Company Name' && companyDetails[selectedCompany]) {
                           setFieldValue('email', companyDetails[selectedCompany].email);
                           setFieldValue('phone', companyDetails[selectedCompany].phone);
+                          setCompanyId(companyDetails[selectedCompany].companyId);
                         } else {
                           setFieldValue('email', '');
                           setFieldValue('phone', '');
